@@ -1,73 +1,64 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/pages/Home.vue";
-import Orders from "@/pages/Orders.vue";
-import OrderDetail from "@/pages/OrderDetail.vue";
-import DishDetails from "@/pages/DishDetails.vue";
+import History from "@/pages/History.vue";
+import GameDetails from "@/pages/GameDetails.vue";
+import HistoryDetails from "@/pages/HistoryDetails.vue";
 import Account from "@/pages/Account.vue";
 import Login from "@/pages/Login.vue";
 import Signup from "@/pages/Signup.vue";
-import Checkout from "@/pages/Chechout.vue";
 import NotFound from "@/pages/NotFound.vue";
 import authService from "@/services/authService.js";
+import appConfig from "@/config/appConfig.js";
 
 const routes = [
   {
     path: "/",
     name: "Home",
     component: Home,
-    meta: { title: "Home • Yume Ramen" },
+    meta: { title: `Home • ${appConfig.name}` },
   },
   {
     path: "/login",
     name: "Login",
     component: Login,
-    meta: { title: "Login • Yume Ramen" },
+    meta: { title: `Login • ${appConfig.name}` },
   },
   {
     path: "/signup",
     name: "Signup",
     component: Signup,
-    meta: { title: "Sign Up • Yume Ramen" },
+    meta: { title: `Sign Up • ${appConfig.name}` },
   },
   {
-    path: "/orders",
-    name: "Orders",
-    component: Orders,
+    path: "/history",
+    name: "History",
+    component: History,
     meta: {
-      title: "Orders • Yume Ramen",
+      title: `History • ${appConfig.name}`,
       requiresAuth: true,
     },
   },
   {
-    path: "/orders/:id",
-    name: "OrderDetail",
-    component: OrderDetail,
+    path: "/history/:id",
+    name: "HistoryDetails",
+    component: HistoryDetails,
     meta: {
-      title: "Order Details • Yume Ramen",
+      title: `History Details • ${appConfig.name}`,
       requiresAuth: true,
     },
   },
   {
     path: "/details/:id",
-    name: "DishDetails",
-    component: DishDetails,
-    meta: { title: "Dish Details • Yume Ramen" },
+    name: "GameDetails",
+    component: GameDetails,
+    meta: { title: `Game Details • ${appConfig.name}` },
   },
   {
     path: "/account",
     name: "Account",
     component: Account,
     meta: {
-      title: "Account • Yume Ramen",
-      requiresAuth: true,
-    },
-  },
-  {
-    path: "/checkout",
-    name: "Checkout",
-    component: Checkout,
-    meta: {
-      title: "Checkout • Yume Ramen",
+      title: `Account • ${appConfig.name}`,
       requiresAuth: true,
     },
   },
@@ -75,7 +66,7 @@ const routes = [
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: NotFound,
-    meta: { title: "404 Not Found • Yume Ramen" },
+    meta: { title: `404 Not Found • ${appConfig.name}` },
   },
 ];
 
@@ -88,7 +79,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || "Yume Ramen";
+  document.title = to.meta.title || appConfig.name;
 
   // Check if the route requires authentication
   if (to.meta.requiresAuth) {

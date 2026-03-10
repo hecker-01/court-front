@@ -1,15 +1,19 @@
-const BASE_URL = "http://localhost:3000/";
-// const BASE_URL = "https://yume-api.heckerdev.net:3000/";
-const API_BASE_URL = BASE_URL + "api/v1";
+import appConfig from "@/config/appConfig";
 
+const BASE_URL = appConfig.apiBaseUrl;
 class ApiService {
   constructor() {
-    this.baseURL = API_BASE_URL;
+    this.baseURL = BASE_URL;
     this.accessToken = null;
     this.refreshToken = null;
   }
 
-  // Helper method to get headers
+  /**
+   * Gets the headers for a fetch request
+   *
+   * @param {boolean} isMultipart - Whether the request is multipart
+   * @returns {Object} - The headers object
+   */
   getHeaders(isMultipart = false) {
     const headers = {};
 
@@ -17,14 +21,17 @@ class ApiService {
       headers["Content-Type"] = "application/json";
     }
 
-    // With HTTP-Only cookies, the browser automatically includes credentials
-    // No need to manually add Authorization header
-    // This parameter is kept for backward compatibility but not used
-
     return headers;
   }
 
-  // Helper method to handle responses
+  /**
+   * Handles the response from a fetch request
+   *
+   * @async
+   * @param {Response} response - The fetch response
+   * @returns {Promise<any>} - The parsed response data
+   * @throws {Error} - If the request fails or the response is not successful
+   */
   async handleResponse(response) {
     if (!response.ok) {
       const error = await response
@@ -47,7 +54,16 @@ class ApiService {
     return response;
   }
 
-  // Authenticated fetch with automatic token refresh on 401
+  /**
+   * Fetches data from a protected endpoint with automatic token refresh on 401
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to access protected endpoints.
+   * @param {string} url - The API endpoint URL
+   * @param {Object} options - Fetch options
+   * @returns {Promise<Response>} - The fetch response
+   * @throws {Error} - If the request fails or the response is not successful
+   */
   async authenticatedFetch(url, options = {}) {
     const defaultOptions = {
       credentials: "include", // Send HTTP-only cookies
@@ -86,76 +102,17 @@ class ApiService {
     return response;
   }
 
-  // ========== AUTH ENDPOINTS ==========
+  // ========== GAMES ENDPOINTS ==========
 
   /**
-   * Login a user
-   * @param {string} email - User email
-   * @param {string} password - User password
-   * @returns {Promise<Object>} - Login response with user data
+   * Get all games
+   *
+   * @async
+   * @returns {Promise<Array>} - List of all games
+   * @throws {Error} - If the request fails or the response is not successful
    */
-  async login(email, password) {
-    const response = await fetch(`${this.baseURL}/auth/login`, {
-      method: "POST",
-      headers: this.getHeaders(),
-      body: JSON.stringify({ email, password }),
-      credentials: "include", // Include cookies in request
-    });
-
-    const data = await this.handleResponse(response);
-
-    // Note: Tokens are stored in HTTP-Only cookies by the server
-    // No client-side token storage needed
-
-    return data;
-  }
-
-  /**
-   * Refresh access token
-   * @returns {Promise<Object>} - New access token
-   */
-  async refreshAccessToken() {
-    const response = await fetch(`${this.baseURL}/auth/refresh`, {
-      method: "POST",
-      headers: this.getHeaders(),
-      credentials: "include", // Include refresh token cookie
-    });
-
-    const data = await this.handleResponse(response);
-
-    // Token is stored in HTTP-Only cookie by the server
-    return data;
-  }
-
-  /**
-   * Logout user (revoke refresh token)
-   * @returns {Promise<Object>} - Logout response
-   */
-  async logout() {
-    try {
-      const response = await fetch(`${this.baseURL}/auth/logout`, {
-        method: "POST",
-        headers: this.getHeaders(),
-        credentials: "include", // Include cookies
-      });
-
-      const data = await this.handleResponse(response);
-
-      return data;
-    } catch (error) {
-      // Clear local state even if logout API fails
-      throw error;
-    }
-  }
-
-  // ========== DISHES ENDPOINTS ==========
-
-  /**
-   * Get all dishes
-   * @returns {Promise<Array>} - List of all dishes
-   */
-  async getDishes() {
-    const response = await fetch(`${this.baseURL}/dishes`, {
+  async getGames() {
+    const response = await fetch(`${this.baseURL}/games`, {
       method: "GET",
       headers: this.getHeaders(),
     });
@@ -164,12 +121,15 @@ class ApiService {
   }
 
   /**
-   * Get a specific dish by ID
-   * @param {number} id - Dish ID
-   * @returns {Promise<Object>} - Dish details
+   * Get a specific game details by ID
+   *
+   * @async
+   * @param {number} id - Game ID
+   * @returns {Promise<Object>} - Game details
+   * @throws {Error} - If the request fails or the response is not successful
    */
-  async getDishById(id) {
-    const response = await fetch(`${this.baseURL}/dishes/${id}`, {
+  async getGameById(id) {
+    const response = await fetch(`${this.baseURL}/games/${id}`, {
       method: "GET",
       headers: this.getHeaders(),
     });
@@ -177,70 +137,77 @@ class ApiService {
     return await this.handleResponse(response);
   }
 
-  // ========== ORDERS ENDPOINTS ==========
-
   /**
-   * Get all orders for the current user
-   * @returns {Promise<Array>} - List of user's orders
+   * Signs up the current user for a game with the specified ID.
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to sign up for a game.
+   * @param {string|number} id - The unique identifier of the game to sign up for.
+   * @returns {Promise<any>} The response data from the server after handling the signup request.
+   * @throws {Error} If the request fails or the response is not successful.
    */
-  async getOrders() {
-    const response = await this.authenticatedFetch(`${this.baseURL}/orders`, {
-      method: "GET",
-    });
-
-    return await this.handleResponse(response);
-  }
-
-  /**
-   * Create a new order
-   * @param {Array} items - Array of items with dishID and quantity
-   * @param {string} deliveryAddress - Delivery address for the order
-   * @returns {Promise<Object>} - Created order details
-   */
-  async createOrder(items, deliveryAddress) {
-    const orderData = { items };
-
-    // Add delivery address if provided
-    if (deliveryAddress) {
-      orderData.delivery_address = deliveryAddress;
-    }
-
-    const response = await this.authenticatedFetch(`${this.baseURL}/orders`, {
-      method: "POST",
-      body: JSON.stringify(orderData),
-    });
-
-    return await this.handleResponse(response);
-  }
-
-  /**
-   * Get a specific order by ID
-   * @param {number} id - Order ID
-   * @returns {Promise<Object>} - Order details
-   */
-  async getOrderById(id) {
+  async signupGame(id) {
     const response = await this.authenticatedFetch(
-      `${this.baseURL}/orders/${id}`,
+      `${this.baseURL}/games/${id}/signup`,
       {
-        method: "GET",
-      }
+        method: "POST",
+      },
     );
 
     return await this.handleResponse(response);
   }
 
   /**
-   * Mark an order as paid (complete payment)
-   * @param {number} id - Order ID
-   * @returns {Promise<Object>} - Updated order details
+   * Creates a new game with the provided game data.
+   *
+   * @async
+   * @requires Admin - The user must be logged as admin in to create a game.
+   * @param {Object} gameData - An object containing the details of the game to be created.
+   * @returns {Promise<any>} The response data from the server after handling the create game request.
+   * @throws {Error} If the request fails or the response is not successful.
    */
-  async paymentComplete(id) {
+  async createGame(gameData) {
+    const response = await this.authenticatedFetch(`${this.baseURL}/games`, {
+      method: "POST",
+      body: JSON.stringify(gameData),
+    });
+
+    return await this.handleResponse(response);
+  }
+
+  // ========== HISTORY ENDPOINTS ==========
+
+  /**
+   * Get the games-history for the current user
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to view their game history.
+   * @returns {Promise<Array>} - List of user's historical games
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async getHistory() {
+    const response = await this.authenticatedFetch(`${this.baseURL}/history`, {
+      method: "GET",
+    });
+
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Get a specific game from the user's history by ID
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to view their game history.
+   * @param {number} id - Game ID
+   * @returns {Promise<Object>} - Game details
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async getHistoryGameById(id) {
     const response = await this.authenticatedFetch(
-      `${this.baseURL}/orders/${id}`,
+      `${this.baseURL}/history/${id}`,
       {
-        method: "PUT",
-        body: JSON.stringify({ Paid: true }),
-      }
+        method: "GET",
+      },
     );
 
     return await this.handleResponse(response);
@@ -250,8 +217,11 @@ class ApiService {
 
   /**
    * Register a new user
-   * @param {Object} userData - User data (username, password, email, address)
+   *
+   * @async
+   * @param {Object} userData - User data (username, password, email)
    * @returns {Promise<Object>} - Created user details
+   * @throws {Error} - If the request fails or the response is not successful
    */
   async registerUser(userData) {
     const response = await fetch(`${this.baseURL}/users`, {
@@ -265,15 +235,19 @@ class ApiService {
 
   /**
    * Get user by ID (view own account)
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to view their account details.
    * @param {number} id - User ID
    * @returns {Promise<Object>} - User details
+   * @throws {Error} - If the request fails or the response is not successful
    */
   async getUserById(id) {
     const response = await this.authenticatedFetch(
       `${this.baseURL}/users/${id}`,
       {
         method: "GET",
-      }
+      },
     );
 
     return await this.handleResponse(response);
@@ -281,9 +255,13 @@ class ApiService {
 
   /**
    * Update user by ID (update own account)
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to update their account.
    * @param {number} id - User ID
    * @param {Object} userData - Updated user data
    * @returns {Promise<Object>} - Update response
+   * @throws {Error} - If the request fails or the response is not successful
    */
   async updateUser(id, userData) {
     const response = await this.authenticatedFetch(
@@ -291,7 +269,7 @@ class ApiService {
       {
         method: "PUT",
         body: JSON.stringify(userData),
-      }
+      },
     );
 
     return await this.handleResponse(response);
@@ -299,15 +277,19 @@ class ApiService {
 
   /**
    * Delete user by ID (delete own account)
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to delete their account.
    * @param {number} id - User ID
    * @returns {Promise<Object>} - Delete response
+   * @throws {Error} - If the request fails or the response is not successful
    */
   async deleteUser(id) {
     const response = await this.authenticatedFetch(
       `${this.baseURL}/users/${id}`,
       {
         method: "DELETE",
-      }
+      },
     );
 
     return await this.handleResponse(response);

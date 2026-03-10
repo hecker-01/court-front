@@ -8,6 +8,8 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
   faHome,
+  faChartLine,
+  faCalendar,
   faClipboardList,
   faUserCircle,
   faShoppingCart,
@@ -40,6 +42,8 @@ import {
 
 library.add(
   faHome,
+  faChartLine,
+  faCalendar,
   faClipboardList,
   faUserCircle,
   faShoppingCart,
@@ -67,7 +71,7 @@ library.add(
   faWallet,
   faUniversity,
   faMobileAlt,
-  faMoneyBillWave
+  faMoneyBillWave,
 );
 
 const app = createApp(App);

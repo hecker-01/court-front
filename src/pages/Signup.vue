@@ -6,12 +6,10 @@ import apiService from "@/services/apiService.js";
 const router = useRouter();
 const formData = ref({
   username: "",
-  last_name: "",
   email: "",
   password: "",
   confirmPassword: "",
   phone_number: "",
-  address: "",
 });
 const error = ref("");
 const isLoading = ref(false);
@@ -44,11 +42,9 @@ const handleSignup = async () => {
   try {
     await apiService.registerUser({
       username: formData.value.username,
-      last_name: formData.value.last_name,
       email: formData.value.email,
       password: formData.value.password,
       phone_number: formData.value.phone_number,
-      address: formData.value.address,
       role: "user",
     });
 
@@ -119,22 +115,6 @@ const handleSignup = async () => {
             />
           </div>
 
-          <!-- <div>
-            <label
-              for="last_name"
-              class="block text-sm font-medium text-gray-700"
-              >Last Name</label
-            >
-            <input
-              id="last_name"
-              v-model="formData.last_name"
-              type="text"
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-              placeholder="Last Name"
-              :disabled="isLoading"
-            />
-          </div> -->
-
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700"
               >Email <span class="text-red-500">*</span></label
@@ -162,21 +142,6 @@ const handleSignup = async () => {
               type="tel"
               class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
               placeholder="Phone Number"
-              :disabled="isLoading"
-            />
-          </div>
-
-          <div>
-            <label for="address" class="block text-sm font-medium text-gray-700"
-              >Address <span class="text-red-500">*</span></label
-            >
-            <textarea
-              id="address"
-              required
-              v-model="formData.address"
-              rows="2"
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-              placeholder="Delivery Address"
               :disabled="isLoading"
             />
           </div>

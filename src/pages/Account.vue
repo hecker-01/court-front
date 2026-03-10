@@ -12,9 +12,7 @@ const isEditing = ref(false);
 const showDeleteConfirm = ref(false);
 const editForm = ref({
   username: "",
-  last_name: "",
   email: "",
-  address: "",
   phone_number: "",
 });
 
@@ -34,9 +32,7 @@ const fetchUserData = async () => {
     // Initialize edit form
     editForm.value = {
       username: user.value.username || user.value.name || "",
-      last_name: user.value.last_name || "",
       email: user.value.email || "",
-      address: user.value.address || "",
       phone_number: user.value.phone_number || "",
     };
   } catch (err) {
@@ -89,9 +85,7 @@ const cancelEdit = () => {
   if (user.value) {
     editForm.value = {
       username: user.value.username || user.value.name || "",
-      last_name: user.value.last_name || "",
       email: user.value.email || "",
-      address: user.value.address || "",
       phone_number: user.value.phone_number || "",
     };
   }
@@ -204,15 +198,6 @@ onMounted(() => {
 
               <div>
                 <label class="block text-sm font-medium text-gray-700"
-                  >Last Name</label
-                >
-                <p class="mt-1 text-lg text-gray-900">
-                  {{ user.last_name || "Not set" }}
-                </p>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700"
                   >Email</label
                 >
                 <p class="mt-1 text-lg text-gray-900">
@@ -226,15 +211,6 @@ onMounted(() => {
                 >
                 <p class="mt-1 text-lg text-gray-900">
                   {{ user.phone_number || "Not set" }}
-                </p>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-700"
-                  >Address</label
-                >
-                <p class="mt-1 text-lg text-gray-900">
-                  {{ user.address || "Not set" }}
                 </p>
               </div>
 
@@ -308,20 +284,6 @@ onMounted(() => {
 
               <div>
                 <label
-                  for="last_name"
-                  class="block text-sm font-medium text-gray-700"
-                  >Last Name</label
-                >
-                <input
-                  id="last_name"
-                  v-model="editForm.last_name"
-                  type="text"
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
-                />
-              </div>
-
-              <div>
-                <label
                   for="email"
                   class="block text-sm font-medium text-gray-700"
                   >Email <span class="text-red-500">*</span></label
@@ -345,21 +307,6 @@ onMounted(() => {
                   id="phone_number"
                   v-model="editForm.phone_number"
                   type="tel"
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
-                />
-              </div>
-
-              <div>
-                <label
-                  for="address"
-                  class="block text-sm font-medium text-gray-700"
-                  >Address <span class="text-red-500">*</span></label
-                >
-                <textarea
-                  id="address"
-                  required
-                  v-model="editForm.address"
-                  rows="3"
                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                 />
               </div>
