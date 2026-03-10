@@ -185,10 +185,13 @@ class ApiService {
    * @returns {Promise<Array>} - List of user's historical games
    * @throws {Error} - If the request fails or the response is not successful
    */
-  async getHistory() {
-    const response = await this.authenticatedFetch(`${this.baseURL}/history`, {
-      method: "GET",
-    });
+  async getHistoricalGames() {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/history/games`,
+      {
+        method: "GET",
+      },
+    );
 
     return await this.handleResponse(response);
   }
@@ -202,13 +205,71 @@ class ApiService {
    * @returns {Promise<Object>} - Game details
    * @throws {Error} - If the request fails or the response is not successful
    */
-  async getHistoryGameById(id) {
+  async getHistoricalGameById(id) {
     const response = await this.authenticatedFetch(
-      `${this.baseURL}/history/${id}`,
+      `${this.baseURL}/history/games/${id}`,
       {
         method: "GET",
       },
     );
+
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Get the historical ELO ratings for the current user
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to view their historical ELO ratings.
+   * @returns {Promise<Array>} - List of historical ELO ratings
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async getHistoricalElo() {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/history/elo`,
+      {
+        method: "GET",
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
+  // ========== PLAYER ENDPOINTS ==========
+
+  /**
+   * Search for players by username
+   *
+   * @async
+   * @param {string} username - The username to search for
+   * @returns {Promise<Array>} - List of players matching the search criteria
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async findPlayer(username) {
+    const response = await fetch(
+      `${this.baseURL}/player/search/${encodeURIComponent(username)}`,
+      {
+        method: "GET",
+        headers: this.getHeaders(),
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Get player profile by ID
+   *
+   * @async
+   * @param {number} id - Player ID
+   * @returns {Promise<Object>} - Player profile details
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async getPlayerProfile(id) {
+    const response = await fetch(`${this.baseURL}/player/profile/${id}`, {
+      method: "GET",
+      headers: this.getHeaders(),
+    });
 
     return await this.handleResponse(response);
   }
