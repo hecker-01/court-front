@@ -83,7 +83,7 @@ console.log("Dish component received dish:", props.dish);
 
 <style scoped>
 .dish-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -97,7 +97,7 @@ console.log("Dish component received dish:", props.dish);
   width: 100%;
   height: 200px;
   overflow: hidden;
-  background: #f3f4f6;
+  background: var(--card-bg);
 }
 
 .dish-image img {

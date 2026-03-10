@@ -110,7 +110,7 @@ watch(
   () => getCart(),
   () => {
     cart.value = getCart();
-  }
+  },
 );
 </script>
 
@@ -399,7 +399,7 @@ watch(
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--torii);
+  color: var(--racket);
   border-radius: 0.25rem;
   transition: background-color 0.2s;
 }
@@ -435,7 +435,7 @@ watch(
 .cart-item-subtotal {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--torii);
+  color: var(--racket);
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -470,7 +470,7 @@ watch(
 }
 
 .total-price {
-  color: var(--torii);
+  color: var(--racket);
   font-size: 1.5rem;
 }
 
@@ -513,7 +513,7 @@ watch(
 }
 
 .checkout-btn {
-  background-color: var(--torii);
+  background-color: var(--racket);
   color: white;
 }
 

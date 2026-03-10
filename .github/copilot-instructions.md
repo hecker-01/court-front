@@ -58,7 +58,7 @@ How to run a single test (if/when tests are added):
 
 ## Other AI assistant configs checked
 
-- No CLAUDE.md, AGENTS.md, .cursorrules, .windsurfrules, CONVENTIONS.md, .clinerules or similar assistant config files were found in the repository root. (Search before assuming alternate agent rules.)
+- No CLAUDE.md, AGENTS.md, .cursorrules, .windsurfrules, CONVENTIONS.md, .clinerules or similar assistant config files were found in the repository root. (Search before asasphaltng alternate agent rules.)
 
 ---
 

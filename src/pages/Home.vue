@@ -71,12 +71,12 @@ onMounted(() => {
     <!-- Error State -->
     <div
       v-else-if="error"
-      class="bg-red-50 border border-red-200 rounded-lg p-6 max-w-2xl mx-auto"
+      class="bg-card-bg border border-red-800 rounded-lg p-6 max-w-2xl mx-auto"
     >
       <div class="flex">
         <div class="flex-shrink-0">
           <svg
-            class="h-5 w-5 text-red-400"
+            class="h-5 w-5 text-red-600"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -89,14 +89,14 @@ onMounted(() => {
           </svg>
         </div>
         <div class="ml-3">
-          <h3 class="text-sm font-medium text-red-800">Error loading dishes</h3>
-          <p class="mt-2 text-sm text-red-700">{{ error }}</p>
-          <p class="mt-1 text-sm text-red-600">
+          <h3 class="text-sm font-medium text-red-200">Error loading dishes</h3>
+          <p class="mt-2 text-sm text-red-300">{{ error }}</p>
+          <p class="mt-1 text-sm text-red-400">
             Make sure the API server is running and accessible.
           </p>
           <button
             @click="fetchDishes"
-            class="mt-3 text-sm font-medium text-red-600 hover:text-red-500 inline-flex items-center"
+            class="mt-3 text-sm font-medium text-red-400 hover:text-red-500 inline-flex items-center"
           >
             <font-awesome-icon icon="redo" class="mr-1" />
             Try again

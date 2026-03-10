@@ -8,7 +8,7 @@
     <p class="text-xl text-gray-600 mb-8">Page Not Found</p>
     <router-link
       to="/"
-      class="px-6 py-3 bg-torii text-white rounded-lg hover:bg-torii-hover transition-colors"
+      class="px-6 py-3 bg-racket text-white rounded-lg hover:bg-racket-hover transition-colors"
     >
       Go Back Home
     </router-link>

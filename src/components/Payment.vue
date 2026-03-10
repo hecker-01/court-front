@@ -63,7 +63,7 @@ const emit = defineEmits(["close", "paymentComplete"]);
 const isProcessingPayment = ref(false);
 const error = ref("");
 const selectedMethod = ref(
-  paymentMethods.find((m) => m.available)?.id || paymentMethods[0].id
+  paymentMethods.find((m) => m.available)?.id || paymentMethods[0].id,
 );
 
 const selectMethod = (method) => {
@@ -316,7 +316,7 @@ const processPayment = async () => {
 }
 
 .method-option.method-selected {
-  border-color: var(--torii);
+  border-color: var(--racket);
   background-color: #fef2f2;
 }
 
@@ -327,7 +327,7 @@ const processPayment = async () => {
 }
 
 .method-option:hover:not(.method-unavailable) {
-  border-color: var(--torii);
+  border-color: var(--racket);
   background-color: #fef2f2;
 }
 
@@ -344,7 +344,7 @@ const processPayment = async () => {
 }
 
 .method-selected .method-icon {
-  color: var(--torii);
+  color: var(--racket);
 }
 
 .method-unavailable .method-icon {
@@ -368,7 +368,7 @@ const processPayment = async () => {
 }
 
 .method-check {
-  color: var(--torii);
+  color: var(--racket);
   font-size: 1.25rem;
 }
 
@@ -447,7 +447,7 @@ const processPayment = async () => {
 }
 
 .pay-btn {
-  background-color: var(--torii);
+  background-color: var(--racket);
   color: white;
 }
 
