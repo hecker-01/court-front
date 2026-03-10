@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { BASE_URL } from "@/services/apiService";
-import { setCartItem, getCartItem } from "@/services/cartService";
 
 const props = defineProps({
   dish: {
@@ -89,7 +88,9 @@ console.log("Dish component received dish:", props.dish);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .dish-image {
