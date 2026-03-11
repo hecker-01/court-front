@@ -112,7 +112,7 @@ onMounted(() => {
               class="px-3 py-1 text-sm font-semibold rounded-lg capitalize"
               :class="getStatusClasses(game.status)"
             >
-              {{ game.status }}
+              {{ game.status === 'processed' ? 'Ended' : game.status }}
             </span>
           </div>
 

@@ -151,56 +151,80 @@ onMounted(() => {
         <div class="bg-charcoal rounded-lg">
           <!-- View Mode -->
           <div v-if="!isEditing" class="p-6">
-            <div class="space-y-5">
-              <div>
-                <p class="text-xs text-asphalt-muted mb-1">Username</p>
-                <p class="text-snow">
-                  {{ user.username || user.name || "N/A" }}
-                </p>
+            <div class="flex gap-8">
+              <!-- Profile Fields -->
+              <div class="flex-1 space-y-5">
+                <div>
+                  <p class="text-xs text-asphalt-muted mb-1">Username</p>
+                  <p class="text-snow">
+                    {{ user.username || user.name || "N/A" }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-xs text-asphalt-muted mb-1">Email</p>
+                  <p class="text-snow">
+                    {{ user.email || "N/A" }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-xs text-asphalt-muted mb-1">Phone Number</p>
+                  <p class="text-snow">
+                    {{ user.phone_number || "Not set" }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-xs text-asphalt-muted mb-1">Account Type</p>
+                  <p class="text-snow capitalize">
+                    {{ user.role || "User" }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-xs text-asphalt-muted mb-1">Member Since</p>
+                  <p class="text-snow">
+                    {{
+                      user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString(
+                            undefined,
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            },
+                          )
+                        : "N/A"
+                    }}
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <p class="text-xs text-asphalt-muted mb-1">Email</p>
-                <p class="text-snow">
-                  {{ user.email || "N/A" }}
-                </p>
-              </div>
-
-              <div>
-                <p class="text-xs text-asphalt-muted mb-1">Phone Number</p>
-                <p class="text-snow">
-                  {{ user.phone_number || "Not set" }}
-                </p>
-              </div>
-
-              <div>
-                <p class="text-xs text-asphalt-muted mb-1">ELO Rating</p>
-                <p class="text-lg font-semibold text-snow">
+              <!-- ELO Feature (right side, hidden on small screens) -->
+              <div
+                class="hidden sm:flex flex-col items-center justify-center px-6 border-l border-asphalt-light min-w-[160px]"
+              >
+                <div
+                  class="w-20 h-20 rounded-full bg-asphalt flex items-center justify-center mb-3"
+                >
+                  <span class="text-2xl font-bold text-snow">
+                    {{ (user.username || user.name || "?")[0].toUpperCase() }}
+                  </span>
+                </div>
+                <p class="text-2xl font-bold text-snow">
                   {{ user.elo ?? 1000 }}
                 </p>
+                <p class="text-xs text-asphalt-muted mt-1">ELO Rating</p>
               </div>
+            </div>
 
-              <div>
-                <p class="text-xs text-asphalt-muted mb-1">Account Type</p>
-                <p class="text-snow capitalize">
-                  {{ user.role || "User" }}
-                </p>
-              </div>
-
-              <div>
-                <p class="text-xs text-asphalt-muted mb-1">Member Since</p>
-                <p class="text-snow">
-                  {{
-                    user.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })
-                      : "N/A"
-                  }}
-                </p>
-              </div>
+            <!-- ELO inline on mobile only -->
+            <div class="sm:hidden mt-5">
+              <p class="text-xs text-asphalt-muted mb-1">ELO Rating</p>
+              <p class="text-lg font-semibold text-snow">
+                {{ user.elo ?? 1000 }}
+              </p>
             </div>
           </div>
 

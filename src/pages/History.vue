@@ -53,7 +53,7 @@ const filterTabs = computed(() => {
     { key: "all", label: "All", count: counts.all },
     { key: "started", label: "Started", count: counts.started },
     { key: "ended", label: "Ended", count: counts.ended },
-    { key: "processed", label: "Processed", count: counts.processed },
+    { key: "processed", label: "Ended", count: counts.processed },
   ];
 });
 

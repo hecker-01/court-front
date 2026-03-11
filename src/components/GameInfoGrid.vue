@@ -14,9 +14,14 @@ const gridClass = computed(
 const items = computed(() => {
   const list = [
     {
+      label: "Planned At",
+      value: formatDate(props.game.plannedAt) || "Unknown",
+      show: props.game.status === "planned",
+    },
+    {
       label: "Started At",
       value: formatDate(props.game.startedAt) || "Unknown",
-      show: true,
+      show: props.game.status !== "planned",
     },
     {
       label: "Ended At",
