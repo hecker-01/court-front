@@ -23,9 +23,9 @@ const items = computed(() => {
 
 <template>
   <div :class="gridClass">
-    <div v-for="item in items" :key="item.label" class="bg-asphalt rounded-lg p-4">
-      <p class="text-xs font-semibold text-asphalt-muted uppercase tracking-wide mb-1">{{ item.label }}</p>
-      <p class="text-sm text-snow mt-1 font-medium">{{ item.value }}</p>
+    <div v-for="item in items" :key="item.label">
+      <p class="text-xs text-asphalt-muted mb-1">{{ item.label }}</p>
+      <p class="text-sm text-snow font-medium">{{ item.value }}</p>
     </div>
   </div>
 </template>

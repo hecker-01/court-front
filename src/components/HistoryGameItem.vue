@@ -1,5 +1,5 @@
 <script setup>
-import { formatDate, getStatusClasses, getStatusBorderColor } from "@/utils/formatters.js";
+import { formatDate } from "@/utils/formatters.js";
 
 const props = defineProps({
   game: { type: Object, required: true },
@@ -7,56 +7,78 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["navigate"]);
+
+const statusConfig = {
+  started: {
+    label: "Started",
+    bg: "bg-status-pending/20",
+    text: "text-status-pending",
+  },
+  ended: {
+    label: "Ended",
+    bg: "bg-status-delivering/20",
+    text: "text-status-delivering",
+  },
+  processed: {
+    label: "Processed",
+    bg: "bg-status-completed/20",
+    text: "text-status-completed",
+  },
+};
+
+const status =
+  statusConfig[props.game.status?.toLowerCase()] || statusConfig.started;
 </script>
 
 <template>
   <div
-    class="bg-charcoal rounded-lg overflow-hidden hover:bg-asphalt transition-colors cursor-pointer border-l-4"
-    :style="{ borderLeftColor: getStatusBorderColor(game.status) }"
+    class="bg-card-bg rounded-lg border border-asphalt-light cursor-pointer transition-colors duration-150 hover:border-snow-dim"
     @click="emit('navigate', game.id)"
   >
     <div class="p-6">
-      <!-- Top row: name + status badge -->
-      <div class="flex justify-between items-center">
-        <h3 class="text-snow font-semibold">{{ game.name }}</h3>
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <h3 class="text-xl font-semibold text-snow">{{ game.name }}</h3>
         <span
-          class="px-3 py-1 text-sm font-semibold rounded-full capitalize"
-          :class="getStatusClasses(game.status)"
+          class="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium"
+          :class="[status.bg, status.text]"
         >
-          {{ game.status }}
+          {{ status.label }}
         </span>
       </div>
 
-      <!-- Description -->
       <p
         v-if="game.description"
-        class="text-sm text-snow-dim line-clamp-2 mt-1"
+        class="text-snow-dim text-sm mb-4 leading-relaxed line-clamp-2"
       >
         {{ game.description }}
       </p>
 
-      <!-- Bottom row -->
-      <div class="flex justify-between items-center border-t border-asphalt-light pt-3 mt-3">
-        <div class="flex items-center gap-4 flex-wrap">
-          <span class="text-xs text-asphalt-muted inline-flex items-center gap-1">
-            <font-awesome-icon icon="calendar-days" />
-            {{ formatDate(game.startedAt) || "Unknown" }}
-          </span>
-          <span
-            v-if="game.userScore != null"
-            class="text-sm text-snow-dim"
-          >
-            Score: <span class="font-semibold text-snow">{{ game.userScore }}</span>
-          </span>
-        </div>
-
-        <span
-          v-if="game.winnerUserId && currentUserId"
-          class="text-sm font-semibold inline-flex items-center gap-1"
-          :class="game.winnerUserId === currentUserId ? 'text-status-completed' : 'text-danger'"
-        >
-          <font-awesome-icon :icon="game.winnerUserId === currentUserId ? 'trophy' : 'circle-xmark'" />
-          {{ game.winnerUserId === currentUserId ? "Win" : "Loss" }}
+      <div
+        class="grid grid-cols-3 gap-2 text-sm border-t border-asphalt-light pt-4"
+      >
+        <span class="text-snow-dim">
+          <font-awesome-icon icon="calendar-days" class="mr-1" />
+          {{ formatDate(game.startedAt) || "Unknown" }}
+        </span>
+        <span class="text-snow-dim text-center">
+          <template v-if="game.userScore != null">
+            Score: {{ game.userScore }}
+          </template>
+          <template v-else>--</template>
+        </span>
+        <span class="text-snow-dim text-right">
+          <template v-if="game.winnerUserId && currentUserId">
+            <span
+              :class="
+                game.winnerUserId === currentUserId
+                  ? 'text-status-completed'
+                  : 'text-danger'
+              "
+            >
+              {{ game.winnerUserId === currentUserId ? "Win" : "Loss" }}
+            </span>
+          </template>
+          <template v-else>--</template>
         </span>
       </div>
     </div>

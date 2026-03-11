@@ -120,45 +120,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-[calc(100dvh-var(--nav-h))] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-3xl mx-auto">
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-snow text-center">
-          Account Settings
-        </h1>
+      <div class="mb-8 pt-4">
+        <h1 class="text-3xl font-bold text-snow">Account</h1>
+        <p class="text-snow-dim text-sm mt-1">Manage your profile</p>
       </div>
 
       <!-- Loading Skeleton -->
-      <div
-        v-if="isLoading"
-        class="bg-charcoal shadow rounded-lg p-6 animate-pulse"
-      >
-        <div class="space-y-6">
-          <div>
-            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
-            <div class="h-6 bg-asphalt-light rounded w-1/2"></div>
-          </div>
-          <div>
-            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
-            <div class="h-6 bg-asphalt-light rounded w-2/3"></div>
-          </div>
-          <div>
-            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
-            <div class="h-6 bg-asphalt-light rounded w-1/3"></div>
-          </div>
-          <div>
-            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
-            <div class="h-10 bg-asphalt-light rounded w-1/5"></div>
-          </div>
-          <div>
-            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
-            <div class="h-6 bg-asphalt-light rounded w-1/4"></div>
-          </div>
-          <div>
-            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
-            <div class="h-6 bg-asphalt-light rounded w-1/3"></div>
-          </div>
-        </div>
+      <div v-if="isLoading" class="bg-charcoal rounded-lg p-6 animate-pulse">
+        <div class="h-5 bg-asphalt-light rounded w-1/3 mb-4"></div>
+        <div class="h-4 bg-asphalt-light rounded w-1/2 mb-3"></div>
+        <div class="h-4 bg-asphalt-light rounded w-2/5 mb-3"></div>
+        <div class="h-4 bg-asphalt-light rounded w-1/4"></div>
       </div>
 
       <!-- Error State -->
@@ -173,59 +147,57 @@ onMounted(() => {
 
       <!-- Account Information -->
       <div v-else-if="user">
-        <div class="bg-charcoal shadow rounded-lg">
+        <div class="bg-charcoal rounded-lg">
           <!-- View Mode -->
           <div v-if="!isEditing" class="p-6">
-            <div class="space-y-6">
+            <div class="space-y-5">
               <div>
-                <label class="block text-sm font-medium text-snow"
-                  >Username</label
-                >
-                <p class="mt-1 text-lg text-snow">
+                <p class="text-xs text-asphalt-muted mb-1">Username</p>
+                <p class="text-snow">
                   {{ user.username || user.name || "N/A" }}
                 </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-snow">Email</label>
-                <p class="mt-1 text-lg text-snow">
+                <p class="text-xs text-asphalt-muted mb-1">Email</p>
+                <p class="text-snow">
                   {{ user.email || "N/A" }}
                 </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-snow"
-                  >Phone Number</label
-                >
-                <p class="mt-1 text-lg text-snow">
+                <p class="text-xs text-asphalt-muted mb-1">Phone Number</p>
+                <p class="text-snow">
                   {{ user.phone_number || "Not set" }}
                 </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-snow">ELO Rating</label>
-                <p class="mt-1 text-2xl font-bold text-ball">
+                <p class="text-xs text-asphalt-muted mb-1">ELO Rating</p>
+                <p class="text-lg font-semibold text-snow">
                   {{ user.elo ?? 1000 }}
                 </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-snow"
-                  >Account Type</label
-                >
-                <p class="mt-1">
-                  <span
-                    class="px-3 py-1 text-sm font-semibold rounded-full bg-asphalt-light text-racket border border-racket"
-                  >
-                    {{ user.role || "User" }}
-                  </span>
+                <p class="text-xs text-asphalt-muted mb-1">Account Type</p>
+                <p class="text-snow capitalize">
+                  {{ user.role || "User" }}
                 </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-snow">Member Since</label>
-                <p class="mt-1 text-lg text-snow">
-                  {{ user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A' }}
+                <p class="text-xs text-asphalt-muted mb-1">Member Since</p>
+                <p class="text-snow">
+                  {{
+                    user.createdAt
+                      ? new Date(user.createdAt).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "N/A"
+                  }}
                 </p>
               </div>
             </div>
@@ -244,25 +216,39 @@ onMounted(() => {
                 @retry="error = ''"
               />
 
-              <FormInput id="username" v-model="editForm.username" label="Username" required />
-              <FormInput id="email" v-model="editForm.email" label="Email" type="email" required />
-              <FormInput id="phone_number" v-model="editForm.phone_number" label="Phone Number" type="tel" />
+              <FormInput
+                id="username"
+                v-model="editForm.username"
+                label="Username"
+                required
+              />
+              <FormInput
+                id="email"
+                v-model="editForm.email"
+                label="Email"
+                type="email"
+                required
+              />
+              <FormInput
+                id="phone_number"
+                v-model="editForm.phone_number"
+                label="Phone Number"
+                type="tel"
+              />
 
               <div class="flex gap-3 pt-4 border-t border-asphalt-light">
                 <button
                   type="submit"
-                  class="flex-1 sm:flex-none px-6 py-2 bg-racket text-white font-medium rounded-md hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket flex items-center justify-center gap-2"
+                  class="px-5 py-2 bg-racket text-white font-medium rounded-md hover:bg-racket-hover"
                 >
-                  <font-awesome-icon icon="save" />
-                  <span>Save Changes</span>
+                  Save
                 </button>
                 <button
                   type="button"
                   @click="cancelEdit"
-                  class="flex-1 sm:flex-none px-6 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-asphalt-light flex items-center justify-center gap-2"
+                  class="px-5 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt"
                 >
-                  <font-awesome-icon icon="times" />
-                  <span>Cancel</span>
+                  Cancel
                 </button>
               </div>
             </form>
@@ -273,26 +259,24 @@ onMounted(() => {
         <div v-if="!isEditing" class="mt-6 flex flex-col sm:flex-row gap-3">
           <button
             @click="isEditing = true"
-            class="w-full sm:flex-1 px-6 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-asphalt-light flex items-center justify-center gap-2"
+            class="px-5 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt"
           >
-            <font-awesome-icon icon="edit" />
-            <span>Edit Profile</span>
+            Edit Profile
           </button>
           <button
             @click="handleLogout"
-            class="w-full sm:flex-1 px-6 py-2 bg-charcoal hover:bg-asphalt text-danger font-medium rounded-md ring-2 ring-danger focus:ring-2 focus:ring-offset-2 focus:ring-danger flex items-center justify-center gap-2"
+            class="px-5 py-2 bg-asphalt-light text-danger font-medium rounded-md hover:bg-asphalt"
           >
-            <font-awesome-icon icon="sign-out-alt" />
-            <span>Logout</span>
+            Logout
           </button>
           <button
             @click="showDeleteConfirm = true"
             :disabled="isAdmin()"
             :class="[
-              'w-full sm:flex-1 px-6 py-2 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center gap-2',
+              'px-5 py-2 font-medium rounded-md',
               isAdmin()
-                ? 'bg-asphalt-light text-asphalt-muted cursor-not-allowed'
-                : 'bg-danger text-white hover:bg-danger-hover focus:ring-danger',
+                ? 'text-asphalt-muted cursor-not-allowed bg-asphalt-light'
+                : 'text-snow hover:bg-danger-hover bg-danger',
             ]"
             :title="
               isAdmin()
@@ -300,8 +284,7 @@ onMounted(() => {
                 : 'Delete account'
             "
           >
-            <font-awesome-icon icon="trash-alt" />
-            <span>Delete Account</span>
+            Delete Account
           </button>
         </div>
       </div>

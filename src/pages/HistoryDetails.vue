@@ -56,7 +56,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-[calc(100dvh-var(--nav-h))] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
       <!-- Back Button -->
       <button
@@ -68,25 +68,10 @@ onMounted(() => {
       </button>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="space-y-6">
-        <div class="bg-charcoal rounded-lg p-8">
-          <div class="animate-pulse space-y-6">
-            <div class="h-8 bg-asphalt-light rounded w-1/3"></div>
-            <div class="space-y-3">
-              <div class="h-4 bg-asphalt-light rounded"></div>
-              <div class="h-4 bg-asphalt-light rounded w-5/6"></div>
-              <div class="h-4 bg-asphalt-light rounded w-4/6"></div>
-            </div>
-          </div>
-        </div>
-        <div class="bg-charcoal rounded-lg p-8">
-          <div class="animate-pulse space-y-4">
-            <div class="h-6 bg-asphalt-light rounded w-1/4"></div>
-            <div class="h-4 bg-asphalt-light rounded w-full"></div>
-            <div class="h-4 bg-asphalt-light rounded w-full"></div>
-            <div class="h-4 bg-asphalt-light rounded w-3/4"></div>
-          </div>
-        </div>
+      <div v-if="isLoading" class="bg-charcoal rounded-lg p-6 animate-pulse">
+        <div class="h-6 bg-asphalt-light rounded w-1/3 mb-4"></div>
+        <div class="h-4 bg-asphalt-light rounded w-2/3 mb-6"></div>
+        <div class="h-4 bg-asphalt-light rounded w-1/2"></div>
       </div>
 
       <!-- Error State -->
@@ -109,8 +94,8 @@ onMounted(() => {
             @click="router.push('/history')"
             class="text-sm font-medium text-danger hover:text-racket inline-flex items-center"
           >
-            <font-awesome-icon icon="trophy" class="mr-1" />
-            View all games
+            <font-awesome-icon icon="arrow-left" class="mr-1" />
+            Back to history
           </button>
         </template>
       </ErrorMessage>
@@ -124,7 +109,7 @@ onMounted(() => {
               {{ game.name }}
             </h1>
             <span
-              class="px-4 py-2 text-sm font-semibold rounded-lg capitalize"
+              class="px-3 py-1 text-sm font-semibold rounded-lg capitalize"
               :class="getStatusClasses(game.status)"
             >
               {{ game.status }}
@@ -135,7 +120,7 @@ onMounted(() => {
             {{ game.description }}
           </p>
 
-          <div class="border-t border-asphalt-light pt-4">
+          <div class="mt-4">
             <GameInfoGrid :game="game" :columns="3" />
           </div>
         </div>

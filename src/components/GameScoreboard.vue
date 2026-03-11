@@ -30,9 +30,9 @@ const sortedParticipants = computed(() => {
       <table class="w-full text-left">
         <thead>
           <tr class="border-b border-asphalt-light">
-            <th class="pb-3 text-xs font-semibold text-asphalt-muted uppercase">Rank</th>
-            <th class="pb-3 text-xs font-semibold text-asphalt-muted uppercase">Player</th>
-            <th class="pb-3 text-xs font-semibold text-asphalt-muted uppercase text-right">Score</th>
+            <th class="pb-3 text-xs font-semibold text-asphalt-muted">Rank</th>
+            <th class="pb-3 text-xs font-semibold text-asphalt-muted">Player</th>
+            <th class="pb-3 text-xs font-semibold text-asphalt-muted text-right">Score</th>
           </tr>
         </thead>
         <tbody>

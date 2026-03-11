@@ -33,7 +33,7 @@ const createChart = () => {
 
   const ctx = canvas.value.getContext("2d");
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.value.clientHeight || 300);
-  gradient.addColorStop(0, "rgba(59, 130, 246, 0.25)");
+  gradient.addColorStop(0, "rgba(59, 130, 246, 0.12)");
   gradient.addColorStop(1, "rgba(59, 130, 246, 0)");
 
   const labels = props.eloData.history.map((h) => formatDate(h.recordedAt));
@@ -118,7 +118,7 @@ watch(
 
 <template>
   <div class="bg-charcoal rounded-lg p-6">
-    <h2 class="text-2xl font-bold text-ball mb-4">
+    <h2 class="text-lg font-semibold text-ball mb-4">
       Current ELO: {{ eloData.currentElo }}
     </h2>
     <div v-if="hasHistory()" class="relative h-64">

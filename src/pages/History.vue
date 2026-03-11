@@ -39,7 +39,12 @@ const filteredGames = computed(() => {
 });
 
 const filterTabs = computed(() => {
-  const counts = { all: games.value.length, started: 0, ended: 0, processed: 0 };
+  const counts = {
+    all: games.value.length,
+    started: 0,
+    ended: 0,
+    processed: 0,
+  };
   games.value.forEach((g) => {
     const s = g.status?.toLowerCase();
     if (counts[s] !== undefined) counts[s]++;
@@ -96,18 +101,21 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-[calc(100dvh-var(--nav-h))] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
-      <h1 class="text-3xl font-bold text-snow mb-2 text-center">
-        Game History
-      </h1>
-      <p v-if="!isLoading && !error && games.length" class="text-sm text-asphalt-muted text-center mb-6">
-        {{ games.length }} games played
-      </p>
+      <div class="mb-8 pt-4">
+        <h1 class="text-3xl font-bold text-snow">Game History</h1>
+        <p class="text-snow-dim text-sm mt-1">
+          Your past games and performance
+        </p>
+      </div>
 
       <!-- ELO History Chart -->
       <EloChart v-if="eloData" :elo-data="eloData" class="mb-8" />
-      <div v-else-if="!error" class="bg-charcoal rounded-lg p-6 mb-8 animate-pulse">
+      <div
+        v-else-if="!error"
+        class="bg-charcoal rounded-lg p-6 mb-8 animate-pulse"
+      >
         <div class="h-7 bg-asphalt-light rounded w-1/4 mb-4"></div>
         <div class="h-64 bg-asphalt-light rounded"></div>
       </div>
@@ -118,18 +126,14 @@ onMounted(() => {
           v-for="tab in filterTabs"
           :key="tab.key"
           @click="activeFilter = tab.key"
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
-          :class="activeFilter === tab.key
-            ? 'bg-racket text-white'
-            : 'bg-asphalt text-snow-dim hover:bg-asphalt-light hover:text-snow'"
+          class="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+          :class="
+            activeFilter === tab.key
+              ? 'bg-racket text-white'
+              : 'bg-asphalt-light text-snow hover:bg-asphalt-muted hover:text-snow'
+          "
         >
           {{ tab.label }}
-          <span
-            class="ml-2 px-2 py-0.5 text-xs rounded-full"
-            :class="activeFilter === tab.key ? 'bg-racket-hover' : 'bg-asphalt-light'"
-          >
-            {{ tab.count }}
-          </span>
         </button>
       </div>
 
@@ -140,17 +144,8 @@ onMounted(() => {
           :key="n"
           class="bg-charcoal rounded-lg p-6 animate-pulse"
         >
-          <div class="flex justify-between items-start mb-4">
-            <div class="flex-1">
-              <div class="h-6 bg-asphalt-light rounded w-1/4 mb-2"></div>
-              <div class="h-4 bg-asphalt-light rounded w-1/3"></div>
-            </div>
-            <div class="h-6 bg-asphalt-light rounded w-20"></div>
-          </div>
-          <div class="space-y-2">
-            <div class="h-4 bg-asphalt-light rounded w-full"></div>
-            <div class="h-4 bg-asphalt-light rounded w-5/6"></div>
-          </div>
+          <div class="h-5 bg-asphalt-light rounded w-1/3 mb-3"></div>
+          <div class="h-4 bg-asphalt-light rounded w-2/3"></div>
         </div>
       </div>
 
@@ -187,7 +182,9 @@ onMounted(() => {
 
         <!-- No results for filter -->
         <div v-if="filteredGames.length === 0" class="text-center py-8">
-          <p class="text-sm text-asphalt-muted">No {{ activeFilter }} games found.</p>
+          <p class="text-sm text-asphalt-muted">
+            No {{ activeFilter }} games found.
+          </p>
         </div>
       </div>
     </div>

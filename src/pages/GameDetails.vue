@@ -98,7 +98,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-[calc(100dvh-var(--nav-h))] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
       <!-- Loading Skeleton -->
       <div v-if="isLoading" class="bg-charcoal shadow rounded-lg p-8">

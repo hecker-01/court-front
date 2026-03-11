@@ -42,4 +42,13 @@ router.isReady().then(() => {
   opacity: 0;
   /* transform: translateX(-20px); */
 }
+
+:root {
+  --nav-h: 5rem;
+}
+@media (min-width: 768px) {
+  :root {
+    --nav-h: 7rem;
+  }
+}
 </style>
