@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import apiService from "@/services/apiService.js";
+import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import FormInput from "@/components/FormInput.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
@@ -55,11 +56,10 @@ const handleSignup = async () => {
     localStorage.removeItem("hasUnpaidOrders");
     localStorage.removeItem("lastUnpaidOrderCheck");
 
-    // Redirect to login page after successful signup
-    router.push({
-      name: "Login",
-      query: { message: "Account created successfully! Please sign in." },
-    });
+    // Auto-login with the credentials just used to register
+    await authService.login(formData.value.email, formData.value.password);
+
+    router.push("/");
   } catch (err) {
     // Check for different error types
     if (err.message.includes("429") || err.message.includes("rate limit")) {

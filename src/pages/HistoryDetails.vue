@@ -4,7 +4,7 @@ import { useRouter, useRoute } from "vue-router";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
-import GameScoreboard from "@/components/GameScoreboard.vue";
+import PlayerList from "@/components/PlayerList.vue";
 import GameInfoGrid from "@/components/GameInfoGrid.vue";
 import { formatDate, getStatusClasses } from "@/utils/formatters.js";
 
@@ -126,10 +126,16 @@ onMounted(() => {
         </div>
 
         <!-- Scoreboard -->
-        <GameScoreboard
-          :participants="game.participants"
-          :winner-user-id="game.winnerUserId"
-        />
+        <div class="bg-charcoal rounded-lg p-6">
+          <h2 class="text-xl font-bold text-snow mb-4">Scoreboard</h2>
+          <PlayerList
+            :participants="game.participants || []"
+            :winner-user-id="game.winnerUserId"
+            value-field="score"
+            value-label="pts"
+            empty-text="No participants recorded."
+          />
+        </div>
       </div>
     </div>
   </div>

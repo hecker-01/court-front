@@ -33,27 +33,29 @@ const sortedGames = computed(() => {
 
 const filteredGames = computed(() => {
   if (activeFilter.value === "all") return sortedGames.value;
+  if (activeFilter.value === "ended") {
+    return sortedGames.value.filter((g) => {
+      const s = g.status?.toLowerCase();
+      return s === "ended" || s === "processed";
+    });
+  }
   return sortedGames.value.filter(
     (g) => g.status?.toLowerCase() === activeFilter.value,
   );
 });
 
 const filterTabs = computed(() => {
-  const counts = {
-    all: games.value.length,
-    started: 0,
-    ended: 0,
-    processed: 0,
-  };
+  let started = 0;
+  let ended = 0;
   games.value.forEach((g) => {
     const s = g.status?.toLowerCase();
-    if (counts[s] !== undefined) counts[s]++;
+    if (s === "started") started++;
+    else if (s === "ended" || s === "processed") ended++;
   });
   return [
-    { key: "all", label: "All", count: counts.all },
-    { key: "started", label: "Started", count: counts.started },
-    { key: "ended", label: "Ended", count: counts.ended },
-    { key: "processed", label: "Ended", count: counts.processed },
+    { key: "all", label: "All", count: games.value.length },
+    { key: "started", label: "Started", count: started },
+    { key: "ended", label: "Ended", count: ended },
   ];
 });
 

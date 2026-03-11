@@ -6,7 +6,7 @@ import authService from "@/services/authService.js";
 import { formatDate } from "@/utils/formatters.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import GameInfoGrid from "@/components/GameInfoGrid.vue";
-import ParticipantsList from "@/components/ParticipantsList.vue";
+import PlayerList from "@/components/PlayerList.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const route = useRoute();
@@ -227,10 +227,12 @@ onMounted(() => {
             Participants ({{ game.participants?.length ?? 0 }})
           </h2>
 
-          <ParticipantsList
+          <PlayerList
             :participants="game.participants || []"
             :winner-user-id="game.winnerUserId"
-            display-field="elo"
+            value-field="elo"
+            value-label="ELO"
+            empty-text="No players have signed up yet."
           />
         </div>
       </div>
