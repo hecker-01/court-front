@@ -21,8 +21,8 @@ const statusConfig = {
   },
   processed: {
     label: "Processed",
-    bg: "bg-status-completed/20",
-    text: "text-status-completed",
+    bg: "bg-status-processed/20",
+    text: "text-status-processed",
   },
 };
 
@@ -32,7 +32,7 @@ const status =
 
 <template>
   <div
-    class="bg-card-bg rounded-lg border border-asphalt-light cursor-pointer transition-colors duration-150 hover:border-snow-dim"
+    class="bg-charcoal rounded-lg border border-asphalt-light cursor-pointer transition-colors duration-150 hover:border-snow-dim"
     @click="emit('navigate', game.id)"
   >
     <div class="p-6">
@@ -62,7 +62,7 @@ const status =
         </span>
         <span class="text-snow-dim text-center">
           <template v-if="game.userScore != null">
-            Score: {{ game.userScore }}
+            Your score: {{ game.userScore }}
           </template>
           <template v-else>--</template>
         </span>
@@ -71,7 +71,7 @@ const status =
             <span
               :class="
                 game.winnerUserId === currentUserId
-                  ? 'text-status-completed'
+                  ? 'text-status-processed'
                   : 'text-danger'
               "
             >

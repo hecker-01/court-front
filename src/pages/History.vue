@@ -17,12 +17,12 @@ const eloData = ref(null);
 const currentUserId = authService.getCurrentUser()?.id;
 const activeFilter = ref("all");
 
-const statusOrder = { started: 0, ended: 1, processed: 2 };
+const statusGame = { started: 0, ended: 1, processed: 2 };
 
 const sortedGames = computed(() => {
   return [...games.value].sort((a, b) => {
-    const orderA = statusOrder[a.status?.toLowerCase()] ?? 3;
-    const orderB = statusOrder[b.status?.toLowerCase()] ?? 3;
+    const orderA = statusGame[a.status?.toLowerCase()] ?? 3;
+    const orderB = statusGame[b.status?.toLowerCase()] ?? 3;
     if (orderA !== orderB) return orderA - orderB;
     // Within same status group, sort by startedAt descending (newest first)
     const dateA = new Date(a.startedAt || 0);
@@ -154,7 +154,7 @@ onMounted(() => {
         v-else-if="error"
         title="Error loading games"
         :message="error"
-        hint="We couldn't load your game history. Please try again."
+        hint="We couldn't load your game history. Check your connection and try again."
         retry-label="Try again"
         @retry="fetchGames"
       />

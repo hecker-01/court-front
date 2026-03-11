@@ -27,10 +27,10 @@ export const formatDate = (dateString, options) => {
  */
 export const getStatusClasses = (status) => {
   const map = {
-    planned: "bg-status-processing-bg text-status-processing",
+    planned: "bg-status-playing-bg text-status-playing",
     started: "bg-status-pending-bg text-status-pending",
-    ended: "bg-status-delivering-bg text-status-delivering",
-    processed: "bg-status-completed-bg text-status-completed",
+    ended: "bg-status-ended-bg text-status-delivering",
+    processed: "bg-status-processed-bg text-status-processed",
   };
   return map[status?.toLowerCase()] || "bg-asphalt text-snow-dim";
 };

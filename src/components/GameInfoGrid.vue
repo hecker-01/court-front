@@ -7,15 +7,28 @@ const props = defineProps({
   columns: { type: Number, default: 4 },
 });
 
-const gridClass = computed(() => `grid grid-cols-2 sm:grid-cols-${props.columns} gap-4`);
+const gridClass = computed(
+  () => `grid grid-cols-2 sm:grid-cols-${props.columns} gap-4`,
+);
 
 const items = computed(() => {
   const list = [
-    { label: "Started", value: formatDate(props.game.startedAt) || "Not started", show: true },
-    { label: "Ended", value: formatDate(props.game.endedAt), show: !!props.game.endedAt },
+    {
+      label: "Started At",
+      value: formatDate(props.game.startedAt) || "Unknown",
+      show: true,
+    },
+    {
+      label: "Ended At",
+      value: formatDate(props.game.endedAt) || "Unknown",
+      show: !!props.game.endedAt,
+    },
   ];
   if (props.columns >= 3) {
-    list.push({ label: "Players", value: props.game.participants?.length ?? 0 });
+    list.push({
+      label: "Players",
+      value: props.game.participants?.length ?? 0,
+    });
   }
   return list.filter((item) => item.show !== false);
 });

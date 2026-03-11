@@ -1,4 +1,6 @@
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
 defineProps({
   visible: {
     type: Boolean,
@@ -36,12 +38,14 @@ defineEmits(["confirm", "cancel"]);
           @click="$emit('cancel')"
           class="px-4 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt"
         >
+          <FontAwesomeIcon icon="times" class="mr-1" />
           Cancel
         </button>
         <button
           @click="$emit('confirm')"
           class="px-4 py-2 bg-danger text-white font-medium rounded-md hover:bg-danger-hover focus:ring-danger"
         >
+          <FontAwesomeIcon icon="trash-alt" class="mr-1" />
           {{ confirmLabel }}
         </button>
       </div>

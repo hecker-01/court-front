@@ -22,7 +22,10 @@ const sortedParticipants = computed(() => {
   <div class="bg-charcoal rounded-lg p-6">
     <h2 class="text-lg font-semibold text-snow mb-4">Scoreboard</h2>
 
-    <div v-if="sortedParticipants.length === 0" class="text-sm text-asphalt-muted text-center py-4">
+    <div
+      v-if="sortedParticipants.length === 0"
+      class="text-sm text-asphalt-muted text-center py-4"
+    >
       No participants recorded.
     </div>
 
@@ -30,9 +33,9 @@ const sortedParticipants = computed(() => {
       <table class="w-full text-left">
         <thead>
           <tr class="border-b border-asphalt-light">
-            <th class="pb-3 text-xs font-semibold text-asphalt-muted">Rank</th>
-            <th class="pb-3 text-xs font-semibold text-asphalt-muted">Player</th>
-            <th class="pb-3 text-xs font-semibold text-asphalt-muted text-right">Score</th>
+            <th class="pb-3 text-xs text-asphalt-muted w-16">#</th>
+            <th class="pb-3 text-xs text-asphalt-muted">Player</th>
+            <th class="pb-3 text-xs text-asphalt-muted text-right">Score</th>
           </tr>
         </thead>
         <tbody>
@@ -40,19 +43,36 @@ const sortedParticipants = computed(() => {
             v-for="(participant, index) in sortedParticipants"
             :key="participant.id"
             class="border-b border-asphalt-light last:border-b-0"
-            :class="participant.userId === winnerUserId ? 'bg-status-completed-bg' : ''"
           >
-            <td class="py-3 text-sm text-snow-dim w-16">
-              #{{ index + 1 }}
-            </td>
-            <td class="py-3 text-sm font-medium text-snow">
-              <span class="flex items-center gap-2">
-                {{ participant.username }}
-                <font-awesome-icon v-if="participant.userId === winnerUserId" icon="trophy" class="text-ball" />
+            <td class="py-3 w-16">
+              <span
+                class="text-sm font-medium"
+                :class="index === 0 ? 'text-ball' : 'text-snow-dim'"
+              >
+                {{ index + 1 }}
               </span>
             </td>
-            <td class="py-3 text-sm font-semibold text-snow text-right">
-              {{ participant.score }}
+            <td class="py-3">
+              <span class="flex items-center gap-2">
+                <span
+                  :class="
+                    participant.userId === winnerUserId
+                      ? 'text-snow font-semibold'
+                      : 'text-snow font-medium'
+                  "
+                  class="text-sm"
+                >
+                  {{ participant.username }}
+                </span>
+                <font-awesome-icon
+                  v-if="participant.userId === winnerUserId"
+                  icon="trophy"
+                  class="text-ball text-xs"
+                />
+              </span>
+            </td>
+            <td class="py-3 text-sm text-snow text-right font-medium">
+              {{ participant.score ?? '--' }}
             </td>
           </tr>
         </tbody>

@@ -11,7 +11,15 @@ import {
   Filler,
 } from "chart.js";
 
-Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Filler);
+Chart.register(
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Tooltip,
+  Filler,
+);
 
 const props = defineProps({
   eloData: { type: Object, required: true },
@@ -32,7 +40,12 @@ const createChart = () => {
   if (!canvas.value || !hasHistory()) return;
 
   const ctx = canvas.value.getContext("2d");
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.value.clientHeight || 300);
+  const gradient = ctx.createLinearGradient(
+    0,
+    0,
+    0,
+    canvas.value.clientHeight || 300,
+  );
   gradient.addColorStop(0, "rgba(59, 130, 246, 0.12)");
   gradient.addColorStop(1, "rgba(59, 130, 246, 0)");
 
@@ -112,19 +125,22 @@ watch(
     destroyChart();
     createChart();
   },
-  { deep: true }
+  { deep: true },
 );
 </script>
 
 <template>
   <div class="bg-charcoal rounded-lg p-6">
-    <h2 class="text-lg font-semibold text-ball mb-4">
+    <h2 class="text-lg font-semibold text-snow mb-4">
       Current ELO: {{ eloData.currentElo }}
     </h2>
     <div v-if="hasHistory()" class="relative h-64">
       <canvas ref="canvas"></canvas>
     </div>
-    <div v-else class="flex items-center justify-center h-64 text-asphalt-muted">
+    <div
+      v-else
+      class="flex items-center justify-center h-64 text-asphalt-muted"
+    >
       No ELO history yet
     </div>
   </div>

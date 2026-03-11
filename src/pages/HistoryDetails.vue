@@ -85,14 +85,14 @@ onMounted(() => {
           <button
             v-if="error !== 'Game not found'"
             @click="fetchGameDetails"
-            class="text-sm font-medium text-danger hover:text-racket inline-flex items-center"
+            class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
           >
             <font-awesome-icon icon="redo" class="mr-1" />
             Try again
           </button>
           <button
             @click="router.push('/history')"
-            class="text-sm font-medium text-danger hover:text-racket inline-flex items-center"
+            class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
           >
             <font-awesome-icon icon="arrow-left" class="mr-1" />
             Back to history

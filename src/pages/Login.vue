@@ -42,6 +42,11 @@ const handleLogin = async () => {
       error.value = "Invalid email or password. Please try again.";
     } else if (err.message.includes("500")) {
       error.value = "Something went wrong. Please try again later.";
+    } else if (
+      err.message.includes("Failed to fetch") ||
+      err.message.includes("NetworkError")
+    ) {
+      error.value = err.message || "Login failed. Please try again.";
     } else {
       error.value = err.message || "Login failed. Please try again.";
     }
@@ -94,7 +99,12 @@ const handleLogin = async () => {
           />
         </div>
 
-        <ErrorMessage v-if="error" title="Login failed" :message="error" hint="Double-check your email and password and try again." />
+        <ErrorMessage
+          v-if="error"
+          title="Login failed"
+          :message="error"
+          :hint="error"
+        />
 
         <div>
           <button

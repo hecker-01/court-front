@@ -24,9 +24,9 @@ const statusConfig = {
     text: "text-status-delivering",
   },
   processed: {
-    label: "Processed",
-    bg: "bg-status-completed/20",
-    text: "text-status-completed",
+    label: "Ended",
+    bg: "bg-status-processed/20",
+    text: "text-status-processed",
   },
 };
 
@@ -39,7 +39,7 @@ const viewDetails = () => {
 
 <template>
   <div
-    class="bg-card-bg rounded-lg border border-asphalt-light cursor-pointer transition-colors duration-150 hover:border-snow-dim"
+    class="bg-charcoal rounded-lg border border-asphalt-light cursor-pointer transition-colors duration-150 hover:border-snow-dim"
     @click="viewDetails"
   >
     <div class="p-6">

@@ -6,6 +6,7 @@ import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
 import FormInput from "@/components/FormInput.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const router = useRouter();
 const isLoading = ref(true);
@@ -241,6 +242,7 @@ onMounted(() => {
                   type="submit"
                   class="px-5 py-2 bg-racket text-white font-medium rounded-md hover:bg-racket-hover"
                 >
+                  <FontAwesomeIcon icon="save" class="mr-1" />
                   Save
                 </button>
                 <button
@@ -248,6 +250,7 @@ onMounted(() => {
                   @click="cancelEdit"
                   class="px-5 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt"
                 >
+                  <FontAwesomeIcon icon="times" class="mr-1" />
                   Cancel
                 </button>
               </div>
@@ -261,12 +264,14 @@ onMounted(() => {
             @click="isEditing = true"
             class="px-5 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt"
           >
+            <FontAwesomeIcon icon="edit" class="mr-1" />
             Edit Profile
           </button>
           <button
             @click="handleLogout"
             class="px-5 py-2 bg-asphalt-light text-danger font-medium rounded-md hover:bg-asphalt"
           >
+            <FontAwesomeIcon icon="sign-out-alt" class="mr-1" />
             Logout
           </button>
           <button
@@ -284,6 +289,7 @@ onMounted(() => {
                 : 'Delete account'
             "
           >
+            <FontAwesomeIcon icon="trash-alt" class="mr-1" />
             Delete Account
           </button>
         </div>

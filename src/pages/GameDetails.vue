@@ -7,6 +7,7 @@ import { formatDate } from "@/utils/formatters.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import GameInfoGrid from "@/components/GameInfoGrid.vue";
 import ParticipantsList from "@/components/ParticipantsList.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const route = useRoute();
 const router = useRouter();
@@ -20,9 +21,21 @@ const gameId = route.params.id;
 
 const statusConfig = {
   planned: { label: "Planned", bg: "bg-racket/20", text: "text-racket" },
-  started: { label: "Started", bg: "bg-status-pending/20", text: "text-status-pending" },
-  ended: { label: "Ended", bg: "bg-status-delivering/20", text: "text-status-delivering" },
-  processed: { label: "Processed", bg: "bg-status-completed/20", text: "text-status-completed" },
+  started: {
+    label: "Started",
+    bg: "bg-status-pending/20",
+    text: "text-status-pending",
+  },
+  ended: {
+    label: "Ended",
+    bg: "bg-status-delivering/20",
+    text: "text-status-delivering",
+  },
+  processed: {
+    label: "Ended",
+    bg: "bg-status-processed/20",
+    text: "text-status-processed",
+  },
 };
 
 const statusDisplay = computed(() => {
@@ -129,15 +142,33 @@ onMounted(() => {
         title="Error loading game"
         :message="error"
         hint="We couldn't load this game. It may no longer be available."
-        retry-label="Try again"
-        @retry="fetchGame"
-      />
+      >
+        <template #actions>
+          <button
+            v-if="error !== 'Game not found'"
+            @click="fetchGame"
+            class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
+          >
+            <font-awesome-icon icon="redo" class="mr-1" />
+            Try again
+          </button>
+          <button
+            @click="router.push('/')"
+            class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
+          >
+            <font-awesome-icon icon="arrow-left" class="mr-1" />
+            Back to home
+          </button>
+        </template>
+      </ErrorMessage>
 
       <!-- Game Details -->
       <div v-else-if="game" class="space-y-6">
         <div class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
           <!-- Header: name + status -->
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+          >
             <h1 class="text-3xl font-bold text-snow">{{ game.name }}</h1>
             <span
               class="self-start shrink-0 px-3 py-1 rounded-full text-sm font-medium"
@@ -165,6 +196,7 @@ onMounted(() => {
                   :disabled="isSigningUp"
                   @click="handleSignup"
                 >
+                  <FontAwesomeIcon icon="sign-in-alt" class="mr-1" />
                   {{ isSigningUp ? "Signing up…" : "Sign Up" }}
                 </button>
                 <button
@@ -173,21 +205,17 @@ onMounted(() => {
                   :disabled="isSigningUp"
                   @click="handleLeave"
                 >
+                  <FontAwesomeIcon icon="sign-out-alt" class="mr-1" />
                   {{ isSigningUp ? "Leaving…" : "Leave Game" }}
                 </button>
               </template>
-              <p v-else-if="game.status === 'started'" class="text-status-pending text-sm font-medium">
-                🏐 Game in progress
-              </p>
-              <p v-else class="text-snow-dim text-sm">
-                This game has ended.
-              </p>
             </template>
             <router-link
               v-else
               :to="{ name: 'Login', query: { redirect: $route.fullPath } }"
               class="inline-block px-6 py-2.5 bg-racket text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover no-underline"
             >
+              <FontAwesomeIcon icon="sign-in-alt" class="mr-1" />
               Sign in to join
             </router-link>
           </div>
@@ -209,4 +237,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-

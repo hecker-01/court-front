@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+</script>
 
 <template>
   <div
@@ -10,6 +12,7 @@
       to="/"
       class="px-6 py-3 bg-racket text-white rounded-lg hover:bg-racket-hover transition-colors"
     >
+      <font-awesome-icon icon="home" class="mr-2" />
       Go Back Home
     </router-link>
   </div>
