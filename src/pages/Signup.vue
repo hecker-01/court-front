@@ -3,6 +3,8 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import apiService from "@/services/apiService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
+import FormInput from "@/components/FormInput.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 const router = useRouter();
 const formData = ref({
@@ -99,87 +101,49 @@ const handleSignup = async () => {
 
       <form class="mt-8 space-y-6" @submit.prevent="handleSignup">
         <div class="space-y-4">
-          <div>
-            <label
-              for="username"
-              class="block text-sm font-medium text-snow-dim"
-              >Username <span class="text-danger">*</span></label
-            >
-            <input
-              id="username"
-              v-model="formData.username"
-              type="text"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-asphalt-light placeholder-asphalt-muted text-snow bg-asphalt rounded-md focus:outline-none focus:ring-racket focus:border-racket sm:text-sm"
-              placeholder="Username"
-              :disabled="isLoading"
-            />
-          </div>
-
-          <div>
-            <label for="email" class="block text-sm font-medium text-snow-dim"
-              >Email <span class="text-danger">*</span></label
-            >
-            <input
-              id="email"
-              v-model="formData.email"
-              type="email"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-asphalt-light placeholder-asphalt-muted text-snow bg-asphalt rounded-md focus:outline-none focus:ring-racket focus:border-racket sm:text-sm"
-              placeholder="Email address"
-              :disabled="isLoading"
-            />
-          </div>
-
-          <div>
-            <label
-              for="phone_number"
-              class="block text-sm font-medium text-snow-dim"
-              >Phone Number</label
-            >
-            <input
-              id="phone_number"
-              v-model="formData.phone_number"
-              type="tel"
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-asphalt-light placeholder-asphalt-muted text-snow bg-asphalt rounded-md focus:outline-none focus:ring-racket focus:border-racket sm:text-sm"
-              placeholder="Phone Number"
-              :disabled="isLoading"
-            />
-          </div>
-
-          <div>
-            <label
-              for="password"
-              class="block text-sm font-medium text-snow-dim"
-              >Password <span class="text-danger">*</span></label
-            >
-            <input
-              id="password"
-              v-model="formData.password"
-              type="password"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-asphalt-light placeholder-asphalt-muted text-snow bg-asphalt rounded-md focus:outline-none focus:ring-racket focus:border-racket sm:text-sm"
-              placeholder="Password (min 6 characters)"
-              :disabled="isLoading"
-            />
-          </div>
-
-          <div>
-            <label
-              for="confirmPassword"
-              class="block text-sm font-medium text-snow-dim"
-              >Confirm Password <span class="text-danger">*</span></label
-            >
-            <input
-              id="confirmPassword"
-              v-model="formData.confirmPassword"
-              type="password"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-asphalt-light placeholder-asphalt-muted text-snow bg-asphalt rounded-md focus:outline-none focus:ring-racket focus:border-racket sm:text-sm"
-              placeholder="Confirm Password"
-              :disabled="isLoading"
-            />
-          </div>
+          <FormInput
+            id="username"
+            v-model="formData.username"
+            label="Username"
+            :required="true"
+            :disabled="isLoading"
+            placeholder="Username"
+          />
+          <FormInput
+            id="email"
+            v-model="formData.email"
+            label="Email"
+            type="email"
+            :required="true"
+            :disabled="isLoading"
+            placeholder="Email address"
+          />
+          <FormInput
+            id="phone_number"
+            v-model="formData.phone_number"
+            label="Phone Number"
+            type="tel"
+            :disabled="isLoading"
+            placeholder="Phone Number"
+          />
+          <FormInput
+            id="password"
+            v-model="formData.password"
+            label="Password"
+            type="password"
+            :required="true"
+            :disabled="isLoading"
+            placeholder="Password (min 6 characters)"
+          />
+          <FormInput
+            id="confirmPassword"
+            v-model="formData.confirmPassword"
+            label="Confirm Password"
+            type="password"
+            :required="true"
+            :disabled="isLoading"
+            placeholder="Confirm Password"
+          />
         </div>
 
         <ErrorMessage v-if="error" title="Signup failed" :message="error" hint="Please review your details and try again." />
@@ -190,27 +154,7 @@ const handleSignup = async () => {
             :disabled="isLoading"
             class="group relative w-full flex items-center justify-center gap-2 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-racket hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg
-              v-if="isLoading"
-              class="animate-spin h-5 w-5 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
+            <LoadingSpinner v-if="isLoading" class="text-white" />
             <font-awesome-icon v-else icon="user-plus" />
             <span>{{ isLoading ? "Creating account..." : "Sign up" }}</span>
           </button>

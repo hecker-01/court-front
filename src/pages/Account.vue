@@ -4,6 +4,8 @@ import { useRouter } from "vue-router";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
+import DeleteConfirmModal from "@/components/DeleteConfirmModal.vue";
+import FormInput from "@/components/FormInput.vue";
 
 const router = useRouter();
 const isLoading = ref(true);
@@ -134,15 +136,27 @@ onMounted(() => {
         <div class="space-y-6">
           <div>
             <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
-            <div class="h-10 bg-asphalt-light rounded w-full"></div>
+            <div class="h-6 bg-asphalt-light rounded w-1/2"></div>
           </div>
           <div>
             <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
-            <div class="h-10 bg-asphalt-light rounded w-full"></div>
+            <div class="h-6 bg-asphalt-light rounded w-2/3"></div>
           </div>
           <div>
             <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
-            <div class="h-10 bg-asphalt-light rounded w-full"></div>
+            <div class="h-6 bg-asphalt-light rounded w-1/3"></div>
+          </div>
+          <div>
+            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
+            <div class="h-10 bg-asphalt-light rounded w-1/5"></div>
+          </div>
+          <div>
+            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
+            <div class="h-6 bg-asphalt-light rounded w-1/4"></div>
+          </div>
+          <div>
+            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
+            <div class="h-6 bg-asphalt-light rounded w-1/3"></div>
           </div>
         </div>
       </div>
@@ -230,47 +244,9 @@ onMounted(() => {
                 @retry="error = ''"
               />
 
-              <div>
-                <label
-                  for="username"
-                  class="block text-sm font-medium text-snow"
-                  >Username <span class="text-danger">*</span></label
-                >
-                <input
-                  id="username"
-                  v-model="editForm.username"
-                  type="text"
-                  required
-                  class="mt-1 block w-full px-3 py-2 bg-asphalt text-snow border border-asphalt-light rounded-md shadow-sm focus:outline-none focus:ring-racket focus:border-racket"
-                />
-              </div>
-
-              <div>
-                <label for="email" class="block text-sm font-medium text-snow"
-                  >Email <span class="text-danger">*</span></label
-                >
-                <input
-                  id="email"
-                  v-model="editForm.email"
-                  type="email"
-                  required
-                  class="mt-1 block w-full px-3 py-2 bg-asphalt text-snow border border-asphalt-light rounded-md shadow-sm focus:outline-none focus:ring-racket focus:border-racket"
-                />
-              </div>
-
-              <div>
-                <label
-                  for="phone_number"
-                  class="block text-sm font-medium text-snow"
-                  >Phone Number</label
-                >
-                <input
-                  id="phone_number"
-                  v-model="editForm.phone_number"
-                  type="tel"
-                  class="mt-1 block w-full px-3 py-2 bg-asphalt text-snow border border-asphalt-light rounded-md shadow-sm focus:outline-none focus:ring-racket focus:border-racket"
-                />
-              </div>
+              <FormInput id="username" v-model="editForm.username" label="Username" required />
+              <FormInput id="email" v-model="editForm.email" label="Email" type="email" required />
+              <FormInput id="phone_number" v-model="editForm.phone_number" label="Phone Number" type="tel" />
 
               <div class="flex gap-3 pt-4 border-t border-asphalt-light">
                 <button
@@ -331,33 +307,11 @@ onMounted(() => {
       </div>
 
       <!-- Delete Confirmation Modal -->
-      <div
-        v-if="showDeleteConfirm"
-        class="fixed inset-0 bg-court/80 flex items-center justify-center z-[100]"
-        @click.self="showDeleteConfirm = false"
-      >
-        <div class="bg-charcoal rounded-lg p-6 max-w-md w-full mx-4">
-          <h3 class="text-lg font-medium text-snow mb-4">Delete Account</h3>
-          <p class="text-sm text-snow-dim mb-6">
-            Are you sure you want to delete your account? This action cannot be
-            undone and all your data will be permanently removed.
-          </p>
-          <div class="flex gap-3 justify-end">
-            <button
-              @click="showDeleteConfirm = false"
-              class="px-4 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt"
-            >
-              Cancel
-            </button>
-            <button
-              @click="handleDeleteAccount"
-              class="px-4 py-2 bg-danger text-white font-medium rounded-md hover:bg-danger-hover focus:ring-danger"
-            >
-              Delete Account
-            </button>
-          </div>
-        </div>
-      </div>
+      <DeleteConfirmModal
+        :visible="showDeleteConfirm"
+        @confirm="handleDeleteAccount"
+        @cancel="showDeleteConfirm = false"
+      />
     </div>
   </div>
 </template>

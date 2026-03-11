@@ -3,7 +3,10 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
+import { formatDate } from "@/utils/formatters.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
+import GameInfoGrid from "@/components/GameInfoGrid.vue";
+import ParticipantsList from "@/components/ParticipantsList.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -32,19 +35,6 @@ const isUserSignedUp = computed(() => {
   const currentUser = authService.getCurrentUser();
   return game.value.participants.some((p) => p.userId === currentUser?.id);
 });
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return null;
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-};
 
 const fetchGame = async () => {
   try {
@@ -163,24 +153,7 @@ onMounted(() => {
           </p>
 
           <!-- Info Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div class="bg-asphalt rounded-lg p-4">
-              <p class="text-xs font-medium text-asphalt-muted uppercase tracking-wide mb-1">Planned</p>
-              <p class="text-snow text-sm font-medium">{{ formatDate(game.plannedAt) || "TBD" }}</p>
-            </div>
-            <div v-if="game.startedAt" class="bg-asphalt rounded-lg p-4">
-              <p class="text-xs font-medium text-asphalt-muted uppercase tracking-wide mb-1">Started</p>
-              <p class="text-snow text-sm font-medium">{{ formatDate(game.startedAt) }}</p>
-            </div>
-            <div v-if="game.endedAt" class="bg-asphalt rounded-lg p-4">
-              <p class="text-xs font-medium text-asphalt-muted uppercase tracking-wide mb-1">Ended</p>
-              <p class="text-snow text-sm font-medium">{{ formatDate(game.endedAt) }}</p>
-            </div>
-            <div class="bg-asphalt rounded-lg p-4">
-              <p class="text-xs font-medium text-asphalt-muted uppercase tracking-wide mb-1">Players</p>
-              <p class="text-snow text-sm font-medium">{{ game.participants?.length ?? 0 }}</p>
-            </div>
-          </div>
+          <GameInfoGrid :game="game" :columns="4" class="mb-6" />
 
           <!-- Signup / Leave Section -->
           <div class="mb-6">
@@ -226,34 +199,11 @@ onMounted(() => {
             Participants ({{ game.participants?.length ?? 0 }})
           </h2>
 
-          <div v-if="game.participants?.length" class="space-y-3">
-            <div
-              v-for="participant in game.participants"
-              :key="participant.id"
-              class="flex items-center justify-between bg-asphalt rounded-lg px-4 py-3"
-              :class="{ 'ring-1 ring-status-completed': game.winnerUserId && participant.userId === game.winnerUserId }"
-            >
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-asphalt-light flex items-center justify-center text-snow text-sm font-semibold uppercase">
-                  {{ participant.username?.charAt(0) || "?" }}
-                </div>
-                <span class="text-snow font-medium">{{ participant.username }}</span>
-                <span
-                  v-if="game.winnerUserId && participant.userId === game.winnerUserId"
-                  class="text-xs font-medium text-status-completed bg-status-completed/20 px-2 py-0.5 rounded-full"
-                >
-                  <font-awesome-icon icon="crown" class="mr-1" /> Winner
-                </span>
-              </div>
-              <span v-if="participant.score != null" class="text-snow-dim text-sm font-mono">
-                {{ participant.score }} pts
-              </span>
-            </div>
-          </div>
-
-          <p v-else class="text-asphalt-muted text-sm">
-            No participants yet. Be the first to sign up!
-          </p>
+          <ParticipantsList
+            :participants="game.participants || []"
+            :winner-user-id="game.winnerUserId"
+            display-field="elo"
+          />
         </div>
       </div>
     </div>

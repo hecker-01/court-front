@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
+import { formatDate } from "@/utils/formatters.js";
 
 const props = defineProps({
   game: {
@@ -19,18 +20,6 @@ const statusConfig = {
 
 const status = statusConfig[props.game.status] || statusConfig.planned;
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return "TBD";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-};
-
 const viewDetails = () => {
   router.push(`/details/${props.game.id}`);
 };
@@ -38,9 +27,12 @@ const viewDetails = () => {
 
 <template>
   <div
-    class="bg-card-bg rounded-lg border border-asphalt-light shadow-sm overflow-hidden cursor-pointer transition-all duration-200 hover:border-racket hover:shadow-lg"
+    class="group bg-card-bg rounded-lg border border-asphalt-light shadow-sm overflow-hidden cursor-pointer transition-all duration-200 hover:border-racket hover:shadow-lg hover:-translate-y-1"
     @click="viewDetails"
   >
+    <!-- Accent bar -->
+    <div class="h-1 bg-racket" />
+
     <div class="p-6">
       <div class="flex items-start justify-between gap-3 mb-3">
         <h3 class="text-xl font-semibold text-snow">{{ game.name }}</h3>
@@ -56,14 +48,28 @@ const viewDetails = () => {
         {{ game.description }}
       </p>
 
-      <div class="flex items-center justify-between text-sm">
+      <div class="grid grid-cols-3 gap-2 text-sm border-t border-asphalt-light pt-4">
         <span class="text-snow-dim">
           <font-awesome-icon icon="calendar-days" class="mr-1" /> {{ formatDate(game.plannedAt) }}
         </span>
-        <span class="text-snow-dim">
+        <span class="text-snow-dim text-center">
           <font-awesome-icon icon="users" class="mr-1" /> {{ game.signupCount ?? 0 }} players
         </span>
+        <span class="text-snow-dim text-right">
+          <template v-if="game.averageElo != null">
+            <font-awesome-icon icon="chart-line" class="mr-1" /> ~{{ game.averageElo }} ELO
+          </template>
+          <template v-else>—</template>
+        </span>
       </div>
+    </div>
+
+    <!-- Hover chevron -->
+    <div class="flex justify-end px-6 pb-4 -mt-1">
+      <font-awesome-icon
+        icon="chevron-right"
+        class="text-asphalt-muted opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-sm"
+      />
     </div>
   </div>
 </template>

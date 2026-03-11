@@ -4,7 +4,9 @@ import { useRouter } from "vue-router";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
+import EmptyState from "@/components/EmptyState.vue";
 import EloChart from "@/components/EloChart.vue";
+import HistoryGameItem from "@/components/HistoryGameItem.vue";
 
 const router = useRouter();
 const isLoading = ref(true);
@@ -15,15 +17,23 @@ const eloData = ref(null);
 const currentUserId = authService.getCurrentUser()?.id;
 const activeFilter = ref("all");
 
-const statusBorderColors = {
-  started: "#f59e0b",
-  ended: "#a78bfa",
-  processed: "#34d399",
-};
+const statusOrder = { started: 0, ended: 1, processed: 2 };
+
+const sortedGames = computed(() => {
+  return [...games.value].sort((a, b) => {
+    const orderA = statusOrder[a.status?.toLowerCase()] ?? 3;
+    const orderB = statusOrder[b.status?.toLowerCase()] ?? 3;
+    if (orderA !== orderB) return orderA - orderB;
+    // Within same status group, sort by startedAt descending (newest first)
+    const dateA = new Date(a.startedAt || 0);
+    const dateB = new Date(b.startedAt || 0);
+    return dateB - dateA;
+  });
+});
 
 const filteredGames = computed(() => {
-  if (activeFilter.value === "all") return games.value;
-  return games.value.filter(
+  if (activeFilter.value === "all") return sortedGames.value;
+  return sortedGames.value.filter(
     (g) => g.status?.toLowerCase() === activeFilter.value,
   );
 });
@@ -41,27 +51,6 @@ const filterTabs = computed(() => {
     { key: "processed", label: "Processed", count: counts.processed },
   ];
 });
-
-const getStatusClasses = (status) => {
-  const map = {
-    planned: "bg-status-processing-bg text-status-processing",
-    started: "bg-status-pending-bg text-status-pending",
-    ended: "bg-status-delivering-bg text-status-delivering",
-    processed: "bg-status-completed-bg text-status-completed",
-  };
-  return map[status?.toLowerCase()] || "bg-asphalt text-snow-dim";
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return null;
-  return new Date(dateString).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
 
 const fetchGames = async () => {
   try {
@@ -118,6 +107,10 @@ onMounted(() => {
 
       <!-- ELO History Chart -->
       <EloChart v-if="eloData" :elo-data="eloData" class="mb-8" />
+      <div v-else-if="!error" class="bg-charcoal rounded-lg p-6 mb-8 animate-pulse">
+        <div class="h-7 bg-asphalt-light rounded w-1/4 mb-4"></div>
+        <div class="h-64 bg-asphalt-light rounded"></div>
+      </div>
 
       <!-- Filter Tabs -->
       <div v-if="!isLoading && !error && games.length" class="flex gap-2 mb-6">
@@ -172,83 +165,25 @@ onMounted(() => {
       />
 
       <!-- Empty State -->
-      <div
+      <EmptyState
         v-else-if="games.length === 0"
-        class="bg-charcoal rounded-lg p-12 text-center"
-      >
-        <font-awesome-icon icon="clipboard-list" class="mx-auto h-12 w-12 text-asphalt-muted" />
-        <h3 class="mt-2 text-sm font-medium text-snow">
-          No games played yet.
-        </h3>
-        <p class="mt-1 text-sm text-asphalt-muted">
-          Join a game and start competing!
-        </p>
-        <div class="mt-6">
-          <button
-            @click="router.push('/')"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-racket hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket"
-          >
-            <font-awesome-icon icon="home" class="mr-2" />
-            Browse Games
-          </button>
-        </div>
-      </div>
+        icon="clipboard-list"
+        title="No games played yet."
+        message="Join a game and start competing!"
+        action-label="Browse Games"
+        action-icon="home"
+        @action="router.push('/')"
+      />
 
       <!-- Games List -->
       <div v-else class="space-y-4">
-        <div
+        <HistoryGameItem
           v-for="game in filteredGames"
           :key="game.id"
-          class="bg-charcoal rounded-lg overflow-hidden hover:bg-asphalt transition-colors cursor-pointer border-l-4"
-          :style="{ borderLeftColor: statusBorderColors[game.status?.toLowerCase()] || '#6b6b6b' }"
-          @click="router.push(`/history/${game.id}`)"
-        >
-          <div class="p-6">
-            <!-- Top row: name + status badge -->
-            <div class="flex justify-between items-center">
-              <h3 class="text-snow font-semibold">{{ game.name }}</h3>
-              <span
-                class="px-3 py-1 text-sm font-semibold rounded-full capitalize"
-                :class="getStatusClasses(game.status)"
-              >
-                {{ game.status }}
-              </span>
-            </div>
-
-            <!-- Middle row: description -->
-            <p
-              v-if="game.description"
-              class="text-sm text-snow-dim line-clamp-2 mt-1"
-            >
-              {{ game.description }}
-            </p>
-
-            <!-- Bottom row -->
-            <div class="flex justify-between items-center border-t border-asphalt-light pt-3 mt-3">
-              <div class="flex items-center gap-4 flex-wrap">
-                <span class="text-xs text-asphalt-muted inline-flex items-center gap-1">
-                  <font-awesome-icon icon="calendar-days" />
-                  {{ formatDate(game.endedAt || game.startedAt) }}
-                </span>
-                <span
-                  v-if="game.userScore != null"
-                  class="text-sm text-snow-dim"
-                >
-                  Score: <span class="font-semibold text-snow">{{ game.userScore }}</span>
-                </span>
-              </div>
-
-              <span
-                v-if="game.winnerUserId && currentUserId"
-                class="text-sm font-semibold inline-flex items-center gap-1"
-                :class="game.winnerUserId === currentUserId ? 'text-status-completed' : 'text-danger'"
-              >
-                <font-awesome-icon :icon="game.winnerUserId === currentUserId ? 'trophy' : 'circle-xmark'" />
-                {{ game.winnerUserId === currentUserId ? "Win" : "Loss" }}
-              </span>
-            </div>
-          </div>
-        </div>
+          :game="game"
+          :current-user-id="currentUserId"
+          @navigate="(id) => router.push(`/history/${id}`)"
+        />
 
         <!-- No results for filter -->
         <div v-if="filteredGames.length === 0" class="text-center py-8">
