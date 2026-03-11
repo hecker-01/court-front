@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
+import ErrorMessage from "@/components/ErrorMessage.vue";
 
 const router = useRouter();
 const isLoading = ref(true);
@@ -120,7 +121,7 @@ onMounted(() => {
   <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-3xl mx-auto">
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 text-center">
+        <h1 class="text-3xl font-bold text-snow text-center">
           Account Settings
         </h1>
       </div>
@@ -128,99 +129,74 @@ onMounted(() => {
       <!-- Loading Skeleton -->
       <div
         v-if="isLoading"
-        class="bg-white shadow rounded-lg p-6 animate-pulse"
+        class="bg-charcoal shadow rounded-lg p-6 animate-pulse"
       >
         <div class="space-y-6">
           <div>
-            <div class="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-            <div class="h-10 bg-gray-200 rounded w-full"></div>
+            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
+            <div class="h-10 bg-asphalt-light rounded w-full"></div>
           </div>
           <div>
-            <div class="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-            <div class="h-10 bg-gray-200 rounded w-full"></div>
+            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
+            <div class="h-10 bg-asphalt-light rounded w-full"></div>
           </div>
           <div>
-            <div class="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-            <div class="h-10 bg-gray-200 rounded w-full"></div>
+            <div class="h-4 bg-asphalt-light rounded w-1/4 mb-2"></div>
+            <div class="h-10 bg-asphalt-light rounded w-full"></div>
           </div>
         </div>
       </div>
 
       <!-- Error State -->
-      <div
+      <ErrorMessage
         v-else-if="error && !user"
-        class="bg-red-50 border border-red-200 rounded-lg p-6"
-      >
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg
-              class="h-5 w-5 text-red-400"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">
-              Error loading account
-            </h3>
-            <p class="mt-2 text-sm text-red-700">{{ error }}</p>
-            <button
-              @click="fetchUserData"
-              class="mt-3 text-sm font-medium text-red-600 hover:text-red-500"
-            >
-              Try again
-            </button>
-          </div>
-        </div>
-      </div>
+        title="Error loading account"
+        :message="error"
+        hint="We couldn't load your profile. Please try again."
+        retry-label="Try again"
+        @retry="fetchUserData"
+      />
 
       <!-- Account Information -->
       <div v-else-if="user">
-        <div class="bg-white shadow rounded-lg">
+        <div class="bg-charcoal shadow rounded-lg">
           <!-- View Mode -->
           <div v-if="!isEditing" class="p-6">
             <div class="space-y-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700"
+                <label class="block text-sm font-medium text-snow"
                   >Username</label
                 >
-                <p class="mt-1 text-lg text-gray-900">
+                <p class="mt-1 text-lg text-snow">
                   {{ user.username || user.name || "N/A" }}
                 </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700"
+                <label class="block text-sm font-medium text-snow"
                   >Email</label
                 >
-                <p class="mt-1 text-lg text-gray-900">
+                <p class="mt-1 text-lg text-snow">
                   {{ user.email || "N/A" }}
                 </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700"
+                <label class="block text-sm font-medium text-snow"
                   >Phone Number</label
                 >
-                <p class="mt-1 text-lg text-gray-900">
+                <p class="mt-1 text-lg text-snow">
                   {{ user.phone_number || "Not set" }}
                 </p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700"
+                <label class="block text-sm font-medium text-snow"
                   >Account Type</label
                 >
                 <p class="mt-1">
                   <span
-                    class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800"
+                    class="px-3 py-1 text-sm font-semibold rounded-full bg-asphalt-light text-racket border border-racket"
                   >
                     {{ user.role || "User" }}
                   </span>
@@ -232,89 +208,64 @@ onMounted(() => {
           <!-- Edit Mode -->
           <div v-else class="p-6">
             <form @submit.prevent="handleUpdateProfile" class="space-y-6">
-              <div
+              <ErrorMessage
                 v-if="error"
-                class="rounded-md bg-red-50 border border-red-200 p-4"
-              >
-                <div class="flex">
-                  <div class="flex-shrink-0">
-                    <svg
-                      class="h-5 w-5 text-red-400"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800">
-                      Update failed
-                    </h3>
-                    <p class="mt-2 text-sm text-red-700">{{ error }}</p>
-                    <button
-                      @click="error = ''"
-                      class="mt-3 text-sm font-medium text-red-600 hover:text-red-500 inline-flex items-center"
-                    >
-                      <font-awesome-icon icon="times" class="mr-1" />
-                      Dismiss
-                    </button>
-                  </div>
-                </div>
-              </div>
+                title="Update failed"
+                :message="error"
+                hint="Your changes couldn't be saved. Please try again."
+                retry-label="Dismiss"
+                retry-icon="times"
+                @retry="error = ''"
+              />
 
               <div>
                 <label
                   for="username"
-                  class="block text-sm font-medium text-gray-700"
-                  >Username <span class="text-red-500">*</span></label
+                  class="block text-sm font-medium text-snow"
+                  >Username <span class="text-danger">*</span></label
                 >
                 <input
                   id="username"
                   v-model="editForm.username"
                   type="text"
                   required
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
+                  class="mt-1 block w-full px-3 py-2 bg-asphalt text-snow border border-asphalt-light rounded-md shadow-sm focus:outline-none focus:ring-racket focus:border-racket"
                 />
               </div>
 
               <div>
                 <label
                   for="email"
-                  class="block text-sm font-medium text-gray-700"
-                  >Email <span class="text-red-500">*</span></label
+                  class="block text-sm font-medium text-snow"
+                  >Email <span class="text-danger">*</span></label
                 >
                 <input
                   id="email"
                   v-model="editForm.email"
                   type="email"
                   required
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
+                  class="mt-1 block w-full px-3 py-2 bg-asphalt text-snow border border-asphalt-light rounded-md shadow-sm focus:outline-none focus:ring-racket focus:border-racket"
                 />
               </div>
 
               <div>
                 <label
                   for="phone_number"
-                  class="block text-sm font-medium text-gray-700"
+                  class="block text-sm font-medium text-snow"
                   >Phone Number</label
                 >
                 <input
                   id="phone_number"
                   v-model="editForm.phone_number"
                   type="tel"
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
+                  class="mt-1 block w-full px-3 py-2 bg-asphalt text-snow border border-asphalt-light rounded-md shadow-sm focus:outline-none focus:ring-racket focus:border-racket"
                 />
               </div>
 
-              <div class="flex gap-3 pt-4 border-t">
+              <div class="flex gap-3 pt-4 border-t border-asphalt-light">
                 <button
                   type="submit"
-                  class="flex-1 sm:flex-none px-6 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center justify-center gap-2"
+                  class="flex-1 sm:flex-none px-6 py-2 bg-racket text-white font-medium rounded-md hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket flex items-center justify-center gap-2"
                 >
                   <font-awesome-icon icon="save" />
                   <span>Save Changes</span>
@@ -322,7 +273,7 @@ onMounted(() => {
                 <button
                   type="button"
                   @click="cancelEdit"
-                  class="flex-1 sm:flex-none px-6 py-2 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 flex items-center justify-center gap-2"
+                  class="flex-1 sm:flex-none px-6 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-asphalt-light flex items-center justify-center gap-2"
                 >
                   <font-awesome-icon icon="times" />
                   <span>Cancel</span>
@@ -336,14 +287,14 @@ onMounted(() => {
         <div v-if="!isEditing" class="mt-6 flex flex-col sm:flex-row gap-3">
           <button
             @click="isEditing = true"
-            class="w-full sm:flex-1 px-6 py-2 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 flex items-center justify-center gap-2"
+            class="w-full sm:flex-1 px-6 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-asphalt-light flex items-center justify-center gap-2"
           >
             <font-awesome-icon icon="edit" />
             <span>Edit Profile</span>
           </button>
           <button
             @click="handleLogout"
-            class="w-full sm:flex-1 px-6 py-2 bg-white hover:bg-gray-100 text-red-600 font-medium rounded-md ring-2 ring-red-600 focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center justify-center gap-2"
+            class="w-full sm:flex-1 px-6 py-2 bg-charcoal hover:bg-asphalt text-danger font-medium rounded-md ring-2 ring-danger focus:ring-2 focus:ring-offset-2 focus:ring-danger flex items-center justify-center gap-2"
           >
             <font-awesome-icon icon="sign-out-alt" />
             <span>Logout</span>
@@ -354,8 +305,8 @@ onMounted(() => {
             :class="[
               'w-full sm:flex-1 px-6 py-2 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center gap-2',
               isAdmin()
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+                ? 'bg-asphalt-light text-asphalt-muted cursor-not-allowed'
+                : 'bg-racket text-white hover:bg-racket-hover focus:ring-racket',
             ]"
             :title="
               isAdmin()
@@ -372,25 +323,25 @@ onMounted(() => {
       <!-- Delete Confirmation Modal -->
       <div
         v-if="showDeleteConfirm"
-        class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[100]"
+        class="fixed inset-0 bg-court/80 flex items-center justify-center z-[100]"
         @click.self="showDeleteConfirm = false"
       >
-        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">Delete Account</h3>
-          <p class="text-sm text-gray-500 mb-6">
+        <div class="bg-charcoal rounded-lg p-6 max-w-md w-full mx-4">
+          <h3 class="text-lg font-medium text-snow mb-4">Delete Account</h3>
+          <p class="text-sm text-snow-dim mb-6">
             Are you sure you want to delete your account? This action cannot be
             undone and all your data will be permanently removed.
           </p>
           <div class="flex gap-3 justify-end">
             <button
               @click="showDeleteConfirm = false"
-              class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300"
+              class="px-4 py-2 bg-asphalt-light text-snow font-medium rounded-md hover:bg-asphalt"
             >
               Cancel
             </button>
             <button
               @click="handleDeleteAccount"
-              class="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700"
+              class="px-4 py-2 bg-racket text-white font-medium rounded-md hover:bg-racket-hover"
             >
               Delete Account
             </button>

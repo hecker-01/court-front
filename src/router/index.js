@@ -1,14 +1,15 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "@/pages/Home.vue";
-import History from "@/pages/History.vue";
-import GameDetails from "@/pages/GameDetails.vue";
-import HistoryDetails from "@/pages/HistoryDetails.vue";
-import Account from "@/pages/Account.vue";
-import Login from "@/pages/Login.vue";
-import Signup from "@/pages/Signup.vue";
-import NotFound from "@/pages/NotFound.vue";
 import authService from "@/services/authService.js";
 import appConfig from "@/config/appConfig.js";
+
+const Home = () => import("@/pages/Home.vue");
+const Login = () => import("@/pages/Login.vue");
+const Signup = () => import("@/pages/Signup.vue");
+const History = () => import("@/pages/History.vue");
+const HistoryDetails = () => import("@/pages/HistoryDetails.vue");
+const GameDetails = () => import("@/pages/GameDetails.vue");
+const Account = () => import("@/pages/Account.vue");
+const NotFound = () => import("@/pages/NotFound.vue");
 
 const routes = [
   {

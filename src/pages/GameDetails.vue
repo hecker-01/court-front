@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 import apiService from "@/services/apiService.js";
 import { BASE_URL } from "@/services/apiService";
 import Dish from "@/components/Dish.vue";
+import ErrorMessage from '@/components/ErrorMessage.vue'
 
 const route = useRoute();
 const dish = ref(null);
@@ -88,58 +89,34 @@ onMounted(() => {
   <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
       <!-- Loading State -->
-      <div v-if="isLoading" class="bg-white shadow rounded-lg p-8">
+      <div v-if="isLoading" class="bg-charcoal shadow rounded-lg p-8">
         <div class="animate-pulse space-y-6">
-          <div class="h-64 bg-gray-200 rounded"></div>
+          <div class="h-64 bg-asphalt-light rounded"></div>
           <div class="space-y-3">
-            <div class="h-8 bg-gray-200 rounded w-1/3"></div>
-            <div class="h-4 bg-gray-200 rounded"></div>
-            <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+            <div class="h-8 bg-asphalt-light rounded w-1/3"></div>
+            <div class="h-4 bg-asphalt-light rounded"></div>
+            <div class="h-4 bg-asphalt-light rounded w-5/6"></div>
           </div>
         </div>
       </div>
 
       <!-- Error State -->
-      <div
+      <ErrorMessage
         v-else-if="error"
-        class="bg-red-50 border border-red-200 rounded-lg p-6"
-      >
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg
-              class="h-5 w-5 text-red-400"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">Error loading dish</h3>
-            <p class="mt-2 text-sm text-red-700">{{ error }}</p>
-            <button
-              @click="fetchDish"
-              class="mt-3 text-sm font-medium text-red-600 hover:text-red-500 inline-flex items-center"
-            >
-              <font-awesome-icon icon="redo" class="mr-1" />
-              Try again
-            </button>
-          </div>
-        </div>
-      </div>
+        title="Error loading dish"
+        :message="error"
+        hint="We couldn't load this dish. It may no longer be available."
+        retry-label="Try again"
+        @retry="fetchDish"
+      />
 
       <!-- Dish Details -->
       <div v-else-if="dish" class="space-y-8">
         <!-- Dish Image and Info -->
-        <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="bg-charcoal shadow rounded-lg overflow-hidden">
           <div class="md:flex">
             <div class="md:w-1/2">
-              <div class="dish-image-container">
+              <div class="relative">
                 <img
                   v-if="imageUrl"
                   :src="imageUrl"
@@ -149,7 +126,7 @@ onMounted(() => {
                 />
                 <div
                   v-else
-                  class="no-image flex items-center justify-center h-64 md:h-96 bg-gray-100"
+                  class="flex items-center justify-center h-64 md:h-96 bg-asphalt"
                 >
                   <div class="text-center">
                     <img
@@ -158,43 +135,43 @@ onMounted(() => {
                       class="w-16 h-16 mx-auto opacity-50 filter grayscale"
                       draggable="false"
                     />
-                    <p class="mt-2 text-gray-500">No Image</p>
+                    <p class="mt-2 text-asphalt-muted">No Image</p>
                   </div>
                 </div>
               </div>
             </div>
             <div class="md:w-1/2 p-6 md:p-8">
-              <h1 class="text-3xl font-bold text-gray-900 mb-4">
+              <h1 class="text-3xl font-bold text-snow mb-4">
                 {{ dish.Name }}
               </h1>
               <div class="mb-6">
-                <h2 class="text-lg font-semibold text-gray-700 mb-2">
+                <h2 class="text-lg font-semibold text-snow-dim mb-2">
                   Ingredients
                 </h2>
-                <p class="text-gray-600 leading-relaxed">
+                <p class="text-snow-dim leading-relaxed">
                   {{ dish.Ingredients }}
                 </p>
               </div>
 
               <div class="flex items-center justify-between mb-4">
-                <span class="text-2xl font-bold text-green-600"
+                <span class="text-2xl font-bold text-turf"
                   >${{ dish.Price?.toFixed(2) }}</span
                 >
               </div>
 
               <div class="flex items-center gap-4">
-                <div class="quantity-controls">
+                <div class="flex items-center gap-2 bg-charcoal border border-asphalt-light rounded-lg p-1">
                   <button
-                    class="quantity-btn"
+                    class="bg-transparent border-0 w-8 h-8 flex items-center justify-center cursor-pointer text-racket rounded transition-colors duration-200 hover:bg-asphalt-light disabled:opacity-50 disabled:cursor-not-allowed"
                     @click="decreaseQuantity"
                     :disabled="quantity <= 1"
                     aria-label="Decrease quantity"
                   >
                     <font-awesome-icon icon="minus" />
                   </button>
-                  <span class="quantity">{{ quantity }}</span>
+                  <span class="text-[1.1rem] font-semibold min-w-[2.5rem] text-center text-snow">{{ quantity }}</span>
                   <button
-                    class="quantity-btn"
+                    class="bg-transparent border-0 w-8 h-8 flex items-center justify-center cursor-pointer text-racket rounded transition-colors duration-200 hover:bg-asphalt-light disabled:opacity-50 disabled:cursor-not-allowed"
                     @click="increaseQuantity"
                     aria-label="Increase quantity"
                   >
@@ -203,16 +180,16 @@ onMounted(() => {
                 </div>
 
                 <button
-                  class="add-to-cart-btn"
-                  :class="{ adding: isAddingToCart }"
+                  class="px-4 py-2 bg-racket text-white border-0 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap min-w-[110px] hover:bg-racket-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                  :class="{ 'bg-turf scale-95': isAddingToCart }"
                   :disabled="isAddingToCart"
                   @click="addToCart"
                 >
-                  <span v-if="!isAddingToCart" class="btn-content">
+                  <span v-if="!isAddingToCart" class="flex items-center justify-center gap-2">
                     <font-awesome-icon icon="shopping-cart" />
                     <span>Add to Cart</span>
                   </span>
-                  <span v-else class="btn-content">
+                  <span v-else class="flex items-center justify-center gap-2">
                     <font-awesome-icon icon="check" />
                     <span>Added!</span>
                   </span>
@@ -225,12 +202,12 @@ onMounted(() => {
         <!-- You May Also Like -->
         <div
           v-if="recommendedDishes().length > 0"
-          class="bg-white shadow rounded-lg p-6"
+          class="bg-charcoal shadow rounded-lg p-6"
         >
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">
+          <h2 class="text-2xl font-bold text-snow mb-6">
             You May Also Like
           </h2>
-          <div class="dishes-grid">
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 mt-6 overflow-visible">
             <Dish
               v-for="recommendedDish in recommendedDishes()"
               :key="recommendedDish.DishID"
@@ -243,87 +220,3 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-.dish-image-container {
-  position: relative;
-}
-
-.no-image {
-  background: #f9fafb;
-}
-
-.quantity-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 0.25rem;
-}
-
-.quantity-btn {
-  background: none;
-  border: none;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #c0392b;
-  border-radius: 0.25rem;
-  transition: background-color 0.2s;
-}
-
-.quantity-btn:hover:not(:disabled) {
-  background-color: #f3f4f6;
-}
-
-.quantity-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.quantity {
-  font-size: 1.1rem;
-  font-weight: 600;
-  min-width: 2.5rem;
-  text-align: center;
-  color: #111827;
-}
-
-.add-to-cart-btn {
-  padding: 0.5rem 1rem;
-  background: #c0392b;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-  min-width: 110px;
-}
-
-.btn-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.add-to-cart-btn.adding {
-  background: #556b2f;
-  transform: scale(0.95);
-}
-
-.dishes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-  overflow: visible;
-}
-</style>

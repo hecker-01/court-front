@@ -115,13 +115,21 @@ watch(
 </script>
 
 <template>
-  <div class="cart-overlay" @click="$emit('close')">
-    <div class="cart-container" @click.stop>
+  <!-- Overlay: mobile = full-screen sheet, md+ = centered modal -->
+  <div
+    class="fixed inset-0 bg-black/50 z-[1000] flex items-stretch justify-center md:items-center md:p-4"
+    @click="$emit('close')"
+  >
+    <!-- Container: mobile = full viewport, md+ = constrained modal -->
+    <div
+      class="bg-charcoal flex flex-col shadow-2xl w-full h-screen max-h-screen md:rounded-2xl md:max-w-[600px] md:h-auto md:max-h-[90vh]"
+      @click.stop
+    >
       <!-- Header -->
-      <div class="cart-header">
-        <h2 class="cart-title">Your Cart</h2>
+      <div class="flex justify-between items-center p-6 border-b border-asphalt-light">
+        <h2 class="text-2xl font-semibold text-snow">Your Cart</h2>
         <button
-          class="close-btn"
+          class="bg-transparent border-0 text-2xl text-snow-dim cursor-pointer p-2 flex items-center justify-center transition-colors duration-200 hover:text-snow"
           @click="$emit('close')"
           aria-label="Close cart"
         >
@@ -130,45 +138,50 @@ watch(
       </div>
 
       <!-- Content -->
-      <div class="cart-content">
-        <div v-if="loading" class="cart-loading">Loading cart...</div>
+      <div class="flex-1 overflow-y-auto p-6">
+        <div v-if="loading" class="text-center py-12 px-4 text-snow-dim">Loading cart...</div>
 
-        <div v-else-if="cartItems.length === 0" class="cart-empty">
+        <div v-else-if="cartItems.length === 0" class="text-center py-12 px-4 text-snow-dim">
           <p>Your cart is empty</p>
-          <p class="cart-empty-hint">
+          <p class="text-sm mt-2">
             Add some delicious dishes to get started!
           </p>
         </div>
 
-        <div v-else class="cart-items">
-          <div v-for="item in cartItems" :key="item.DishID" class="cart-item">
-            <div class="cart-item-image">
+        <div v-else class="flex flex-col gap-4">
+          <div
+            v-for="item in cartItems"
+            :key="item.DishID"
+            class="flex gap-4 p-4 bg-asphalt rounded-xl border border-asphalt-light"
+          >
+            <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-charcoal">
               <img
                 v-if="getImageUrl(item)"
                 :src="getImageUrl(item)"
                 :alt="item.Name"
+                class="w-full h-full object-cover"
               />
-              <div v-else class="no-image-placeholder">
-                <img src="/favicon.svg" alt="No image" />
+              <div v-else class="w-full h-full flex items-center justify-center bg-asphalt">
+                <img src="/favicon.svg" alt="No image" class="w-2/5 h-2/5 opacity-30" />
               </div>
             </div>
 
-            <div class="cart-item-details">
-              <h3 class="cart-item-name">{{ item.Name }}</h3>
-              <p class="cart-item-price">${{ item.Price.toFixed(2) }} each</p>
+            <div class="flex-1 flex flex-col gap-2">
+              <h3 class="text-base font-semibold text-snow m-0">{{ item.Name }}</h3>
+              <p class="text-sm text-snow-dim m-0">${{ item.Price.toFixed(2) }} each</p>
 
-              <div class="cart-item-controls">
-                <div class="quantity-controls">
+              <div class="flex items-center gap-4 mt-auto">
+                <div class="flex items-center gap-2 bg-charcoal border border-asphalt-light rounded-lg p-1">
                   <button
-                    class="quantity-btn"
+                    class="bg-transparent border-0 w-7 h-7 flex items-center justify-center cursor-pointer text-racket rounded transition-colors duration-200 hover:bg-asphalt-light"
                     @click="updateQuantity(item.DishID, item.quantity - 1)"
                     aria-label="Decrease quantity"
                   >
                     <font-awesome-icon icon="minus" />
                   </button>
-                  <span class="quantity">{{ item.quantity }}</span>
+                  <span class="text-base font-medium min-w-[2rem] text-center text-snow">{{ item.quantity }}</span>
                   <button
-                    class="quantity-btn"
+                    class="bg-transparent border-0 w-7 h-7 flex items-center justify-center cursor-pointer text-racket rounded transition-colors duration-200 hover:bg-asphalt-light"
                     @click="updateQuantity(item.DishID, item.quantity + 1)"
                     aria-label="Increase quantity"
                   >
@@ -177,7 +190,7 @@ watch(
                 </div>
 
                 <button
-                  class="remove-btn"
+                  class="bg-transparent border-0 text-danger cursor-pointer p-2 flex items-center justify-center transition-opacity duration-200 hover:opacity-70"
                   @click="removeItem(item.DishID)"
                   aria-label="Remove item"
                 >
@@ -186,28 +199,35 @@ watch(
               </div>
             </div>
 
-            <div class="cart-item-subtotal">
+            <div class="text-base font-semibold text-racket flex items-center flex-shrink-0">
               ${{ item.subtotal.toFixed(2) }}
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Footer -->
-      <div v-if="cartItems.length > 0" class="cart-footer">
-        <div class="cart-summary">
-          <div class="cart-total">
+      <!-- Footer: mobile = no radius, md+ = rounded bottom -->
+      <div v-if="cartItems.length > 0" class="border-t border-asphalt-light p-6 bg-court md:rounded-b-2xl">
+        <div class="mb-4">
+          <div class="flex justify-between items-center text-lg font-semibold text-snow">
             <span>Total ({{ totalItems }} items):</span>
-            <span class="total-price">${{ totalPrice.toFixed(2) }}</span>
+            <span class="text-racket text-2xl">${{ totalPrice.toFixed(2) }}</span>
           </div>
         </div>
 
-        <div class="cart-actions">
-          <button class="clear-cart-btn" @click="clearAllCart">
+        <!-- Actions: stacked on mobile, side-by-side from sm breakpoint up -->
+        <div class="flex gap-4 flex-col sm:flex-row">
+          <button
+            class="flex-1 py-[0.875rem] px-6 bg-asphalt text-snow-dim border border-asphalt-light rounded-lg text-base font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 hover:bg-asphalt-light hover:text-snow"
+            @click="clearAllCart"
+          >
             <font-awesome-icon icon="trash-alt" />
             <span>Clear Cart</span>
           </button>
-          <button class="checkout-btn" @click="checkout">
+          <button
+            class="flex-1 py-[0.875rem] px-6 bg-racket text-white border-0 rounded-lg text-base font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 hover:bg-racket-hover hover:-translate-y-0.5 hover:shadow-lg"
+            @click="checkout"
+          >
             <font-awesome-icon icon="shopping-cart" />
             <span>Proceed to Checkout</span>
           </button>
@@ -216,310 +236,3 @@ watch(
     </div>
   </div>
 </template>
-
-<style scoped>
-.cart-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
-
-@media (max-width: 768px) {
-  .cart-overlay {
-    padding: 0;
-    align-items: stretch;
-  }
-}
-
-.cart-container {
-  background-color: white;
-  border-radius: 1rem;
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-@media (max-width: 768px) {
-  .cart-container {
-    max-width: 100%;
-    max-height: 100vh;
-    height: 100vh;
-    border-radius: 0;
-  }
-}
-
-.cart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.cart-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--charcoal);
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s;
-}
-
-.close-btn:hover {
-  color: var(--charcoal);
-}
-
-.cart-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
-}
-
-.cart-loading,
-.cart-empty {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: #6b7280;
-}
-
-.cart-empty-hint {
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.cart-items {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.cart-item {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: #f9fafb;
-  border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-}
-
-.cart-item-image {
-  width: 80px;
-  height: 80px;
-  flex-shrink: 0;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  background-color: white;
-}
-
-.cart-item-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.no-image-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f3f4f6;
-}
-
-.no-image-placeholder img {
-  width: 40%;
-  height: 40%;
-  opacity: 0.3;
-}
-
-.cart-item-details {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.cart-item-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--charcoal);
-  margin: 0;
-}
-
-.cart-item-price {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0;
-}
-
-.cart-item-controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: auto;
-}
-
-.quantity-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 0.25rem;
-}
-
-.quantity-btn {
-  background: none;
-  border: none;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--racket);
-  border-radius: 0.25rem;
-  transition: background-color 0.2s;
-}
-
-.quantity-btn:hover {
-  background-color: #f3f4f6;
-}
-
-.quantity {
-  font-size: 1rem;
-  font-weight: 500;
-  min-width: 2rem;
-  text-align: center;
-  color: var(--charcoal);
-}
-
-.remove-btn {
-  background: none;
-  border: none;
-  color: #ef4444;
-  cursor: pointer;
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s;
-}
-
-.remove-btn:hover {
-  opacity: 0.7;
-}
-
-.cart-item-subtotal {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--racket);
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.cart-footer {
-  border-top: 1px solid #e5e7eb;
-  padding: 1.5rem;
-  background-color: #f9fafb;
-  border-bottom-left-radius: 1rem;
-  border-bottom-right-radius: 1rem;
-}
-
-@media (max-width: 768px) {
-  .cart-footer {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-}
-
-.cart-summary {
-  margin-bottom: 1rem;
-}
-
-.cart-total {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--charcoal);
-}
-
-.total-price {
-  color: var(--racket);
-  font-size: 1.5rem;
-}
-
-.cart-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-@media (max-width: 480px) {
-  .cart-actions {
-    flex-direction: column;
-  }
-}
-
-.clear-cart-btn,
-.checkout-btn {
-  flex: 1;
-  padding: 0.875rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.clear-cart-btn {
-  background-color: white;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
-}
-
-.clear-cart-btn:hover {
-  background-color: #f9fafb;
-  color: var(--charcoal);
-}
-
-.checkout-btn {
-  background-color: var(--racket);
-  color: white;
-}
-
-.checkout-btn:hover {
-  background-color: #c83e3e;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-</style>

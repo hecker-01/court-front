@@ -5,6 +5,7 @@ import apiService from "@/services/apiService.js";
 import { BASE_URL } from "@/services/apiService.js";
 import authService from "@/services/authService.js";
 import Payment from "@/components/Payment.vue";
+import ErrorMessage from '@/components/ErrorMessage.vue'
 
 const router = useRouter();
 const route = useRoute();
@@ -120,17 +121,17 @@ const fetchOrderDetails = async () => {
 
 const getStatusColor = (status) => {
   const statusMap = {
-    ordered: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    processing: "bg-blue-100 text-blue-800 border-blue-200",
-    preparing: "bg-blue-100 text-blue-800 border-blue-200",
-    delivering: "bg-purple-100 text-purple-800 border-purple-200",
-    completed: "bg-green-100 text-green-800 border-green-200",
-    cancelled: "bg-red-100 text-red-800 border-red-200",
+    ordered: "bg-status-pending-bg text-status-pending border-status-pending",
+    pending: "bg-status-pending-bg text-status-pending border-status-pending",
+    processing: "bg-status-processing-bg text-status-processing border-status-processing",
+    preparing: "bg-status-processing-bg text-status-processing border-status-processing",
+    delivering: "bg-status-delivering-bg text-status-delivering border-status-delivering",
+    completed: "bg-status-completed-bg text-status-completed border-status-completed",
+    cancelled: "bg-status-cancelled-bg text-status-cancelled border-status-cancelled",
   };
   return (
     statusMap[status?.toLowerCase()] ||
-    "bg-gray-100 text-gray-800 border-gray-200"
+    "bg-asphalt text-snow-dim border-asphalt-light"
   );
 };
 
@@ -198,80 +199,60 @@ onBeforeUnmount(() => {
       <!-- Back Button -->
       <button
         @click="router.push('/orders')"
-        class="mb-6 inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
+        class="mb-6 inline-flex items-center text-sm font-medium text-snow-dim hover:text-snow"
       >
         <font-awesome-icon icon="arrow-left" class="mr-2" />
         Back to Orders
       </button>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="bg-white shadow rounded-lg p-8">
+      <div v-if="isLoading" class="bg-charcoal rounded-lg p-8">
         <div class="animate-pulse space-y-6">
-          <div class="h-8 bg-gray-200 rounded w-1/3"></div>
+          <div class="h-8 bg-asphalt-light rounded w-1/3"></div>
           <div class="space-y-3">
-            <div class="h-4 bg-gray-200 rounded"></div>
-            <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-            <div class="h-4 bg-gray-200 rounded w-4/6"></div>
+            <div class="h-4 bg-asphalt-light rounded"></div>
+            <div class="h-4 bg-asphalt-light rounded w-5/6"></div>
+            <div class="h-4 bg-asphalt-light rounded w-4/6"></div>
           </div>
         </div>
       </div>
 
       <!-- Error State -->
-      <div
+      <ErrorMessage
         v-else-if="error"
-        class="bg-red-50 border border-red-200 rounded-lg p-6"
+        title="Error loading order"
+        :message="error"
+        hint="We couldn't load this order. Try again or go back to your order history."
       >
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg
-              class="h-5 w-5 text-red-400"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">
-              Error loading order
-            </h3>
-            <p class="mt-2 text-sm text-red-700">{{ error }}</p>
-            <div class="mt-3 space-x-3">
-              <button
-                v-if="error !== 'Order not found'"
-                @click="fetchOrderDetails"
-                class="text-sm font-medium text-red-600 hover:text-red-500 inline-flex items-center"
-              >
-                <font-awesome-icon icon="redo" class="mr-1" />
-                Try again
-              </button>
-              <button
-                @click="router.push('/orders')"
-                class="text-sm font-medium text-red-600 hover:text-red-500 inline-flex items-center"
-              >
-                <font-awesome-icon icon="clipboard-list" class="mr-1" />
-                View all orders
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+        <template #actions>
+          <button
+            v-if="error !== 'Order not found'"
+            @click="fetchOrderDetails"
+            class="text-sm font-medium text-danger hover:text-racket inline-flex items-center"
+          >
+            <font-awesome-icon icon="redo" class="mr-1" />
+            Try again
+          </button>
+          <button
+            @click="router.push('/orders')"
+            class="text-sm font-medium text-danger hover:text-racket inline-flex items-center"
+          >
+            <font-awesome-icon icon="clipboard-list" class="mr-1" />
+            View all orders
+          </button>
+        </template>
+      </ErrorMessage>
 
       <!-- Order Details -->
       <div v-else-if="order" class="space-y-6">
         <!-- Order Header -->
-        <div class="bg-white shadow rounded-lg p-6">
+        <div class="bg-charcoal rounded-lg p-6">
           <div class="flex justify-between items-start mb-4">
             <div>
-              <h1 class="text-3xl font-bold text-gray-900">
+              <h1 class="text-3xl font-bold text-snow">
                 Order #{{ order.OrderID || order.id }}
               </h1>
-              <p class="text-sm text-gray-500 mt-1">
+              <p class="text-sm text-asphalt-muted mt-1">
                 Placed on {{ formatDate(order.Ordered_at || order.createdAt) }}
               </p>
             </div>
@@ -285,18 +266,18 @@ onBeforeUnmount(() => {
 
           <!-- Order Timeline -->
           <div class="border-t pt-6 mt-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <h2 class="text-lg font-semibold text-snow mb-4">
               Order Status
             </h2>
             <div class="space-y-3">
               <div class="flex items-center">
                 <div
                   class="w-3 h-3 rounded-full"
-                  :class="order.Ordered_at ? 'bg-green-500' : 'bg-gray-300'"
+                  :class="order.Ordered_at ? 'bg-status-completed' : 'bg-asphalt-light'"
                 ></div>
                 <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-900">Ordered</p>
-                  <p class="text-xs text-gray-500">
+                  <p class="text-sm font-medium text-snow">Ordered</p>
+                  <p class="text-xs text-asphalt-muted">
                     {{ formatDate(order.Ordered_at) }}
                   </p>
                 </div>
@@ -304,11 +285,11 @@ onBeforeUnmount(() => {
               <div class="flex items-center">
                 <div
                   class="w-3 h-3 rounded-full"
-                  :class="order.processing_at ? 'bg-green-500' : 'bg-gray-300'"
+                  :class="order.processing_at ? 'bg-status-completed' : 'bg-asphalt-light'"
                 ></div>
                 <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-900">Processing</p>
-                  <p class="text-xs text-gray-500">
+                  <p class="text-sm font-medium text-snow">Processing</p>
+                  <p class="text-xs text-asphalt-muted">
                     {{ formatDate(order.processing_at) }}
                   </p>
                 </div>
@@ -316,11 +297,11 @@ onBeforeUnmount(() => {
               <div class="flex items-center">
                 <div
                   class="w-3 h-3 rounded-full"
-                  :class="order.Delivering_at ? 'bg-green-500' : 'bg-gray-300'"
+                  :class="order.Delivering_at ? 'bg-status-completed' : 'bg-asphalt-light'"
                 ></div>
                 <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-900">Delivering</p>
-                  <p class="text-xs text-gray-500">
+                  <p class="text-sm font-medium text-snow">Delivering</p>
+                  <p class="text-xs text-asphalt-muted">
                     {{ formatDate(order.Delivering_at) }}
                   </p>
                 </div>
@@ -328,11 +309,11 @@ onBeforeUnmount(() => {
               <div class="flex items-center">
                 <div
                   class="w-3 h-3 rounded-full"
-                  :class="order.Completed_at ? 'bg-green-500' : 'bg-gray-300'"
+                  :class="order.Completed_at ? 'bg-status-completed' : 'bg-asphalt-light'"
                 ></div>
                 <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-900">Completed</p>
-                  <p class="text-xs text-gray-500">
+                  <p class="text-sm font-medium text-snow">Completed</p>
+                  <p class="text-xs text-asphalt-muted">
                     {{ formatDate(order.Completed_at) }}
                   </p>
                 </div>
@@ -342,8 +323,8 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Order Items -->
-        <div class="bg-white shadow rounded-lg p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Order Items</h2>
+        <div class="bg-charcoal rounded-lg p-6">
+          <h2 class="text-lg font-semibold text-snow mb-4">Order Items</h2>
           <div class="divide-y">
             <div
               v-for="item in order.items"
@@ -359,7 +340,7 @@ onBeforeUnmount(() => {
                     class="w-20 h-20 object-cover rounded"
                   />
                   <div class="flex-1">
-                    <p class="font-medium text-gray-900 text-lg">
+                    <p class="font-medium text-snow text-lg">
                       {{
                         item.name ||
                         item.dishName ||
@@ -367,10 +348,10 @@ onBeforeUnmount(() => {
                         `Dish #${item.dishID}`
                       }}
                     </p>
-                    <p class="text-gray-500 mt-1">
+                    <p class="text-asphalt-muted mt-1">
                       Quantity: {{ getItemQuantity(item) }}
                     </p>
-                    <p class="text-sm text-gray-600 mt-1">
+                    <p class="text-sm text-snow-dim mt-1">
                       ${{ getItemPrice(item).toFixed(2) }} each
                     </p>
 
@@ -381,10 +362,10 @@ onBeforeUnmount(() => {
                       "
                       class="mt-2"
                     >
-                      <p class="text-xs font-semibold text-gray-700 uppercase">
+                      <p class="text-xs font-semibold text-snow-dim uppercase">
                         Ingredients:
                       </p>
-                      <p class="text-sm text-gray-600 mt-1">
+                      <p class="text-sm text-snow-dim mt-1">
                         {{
                           dishDetails.get(item.dishID || item.id)?.Ingredients
                         }}
@@ -393,10 +374,10 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
                 <div class="ml-4 text-right">
-                  <p class="font-semibold text-gray-900 text-lg">
+                  <p class="font-semibold text-snow text-lg">
                     ${{ getItemSubtotal(item).toFixed(2) }}
                   </p>
-                  <p class="text-xs text-gray-500 mt-1">
+                  <p class="text-xs text-asphalt-muted mt-1">
                     {{ getItemQuantity(item) }} × ${{
                       getItemPrice(item).toFixed(2)
                     }}
@@ -416,7 +397,7 @@ onBeforeUnmount(() => {
               <span class="text-sm font-medium">Payment Status</span>
               <span
                 class="text-sm font-semibold"
-                :class="order.Paid ? 'text-green-600' : 'text-red-600'"
+                :class="order.Paid ? 'text-status-completed' : 'text-danger'"
               >
                 {{ order.Paid ? "Paid" : "Unpaid" }}
               </span>
@@ -426,7 +407,7 @@ onBeforeUnmount(() => {
             <div v-if="!order.Paid" class="mt-4">
               <button
                 @click="openPaymentPopup"
-                class="w-full px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+                class="w-full px-6 py-3 bg-racket text-white font-semibold rounded-lg hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-racket focus:ring-offset-2 transition-colors"
               >
                 <font-awesome-icon icon="credit-card" class="mr-2" />
                 Pay Now
@@ -438,12 +419,12 @@ onBeforeUnmount(() => {
         <!-- Delivery Information -->
         <div
           v-if="order.delivery_address"
-          class="bg-white shadow rounded-lg p-6"
+          class="bg-charcoal rounded-lg p-6"
         >
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">
+          <h2 class="text-lg font-semibold text-snow mb-4">
             Delivery Information
           </h2>
-          <p class="text-gray-700">{{ order.delivery_address }}</p>
+          <p class="text-snow-dim">{{ order.delivery_address }}</p>
         </div>
       </div>
 

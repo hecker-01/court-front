@@ -2,21 +2,17 @@
 @import "./base.css";
 
 :root {
-  --court: #141414;
-  --charcoal: #e0e0e0;
   --asphalt: #252525;
+  --asphalt-light: #2e2e2e;
   --asphalt-muted: #6b6b6b;
-  --racket: #e8a020;
-  --racket-hover: #c4851a;
-  --turf: #3a7d44;
-  --ball: #c8d400;
-  --card-bg: #1e1e1e;
-  --border-subtle: #2e2e2e;
+  --charcoal: #1e1e1e;
+  --racket: #3b82f6;
+  --snow: #f0f0f0;
 }
 
 ::selection {
   background: var(--racket);
-  color: var(--charcoal);
+  color: var(--snow);
 }
 
 ::-webkit-scrollbar {
@@ -28,7 +24,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--asphalt);
+  background: var(--asphalt-light);
   border-radius: 0;
 }
 
