@@ -113,6 +113,15 @@ onMounted(() => {
 <template>
   <div class="min-h-[calc(100dvh-var(--nav-h))] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
+      <!-- Back Button -->
+      <button
+        @click="router.push('/')"
+        class="mb-6 inline-flex items-center text-sm font-medium text-snow-dim hover:text-snow"
+      >
+        <font-awesome-icon icon="arrow-left" class="mr-2" />
+        Back to Games
+      </button>
+
       <!-- Loading Skeleton -->
       <div v-if="isLoading" class="bg-charcoal shadow rounded-lg p-8">
         <div class="animate-pulse space-y-6">
