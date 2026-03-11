@@ -102,6 +102,74 @@ class ApiService {
     return response;
   }
 
+  // ========== AUTH ENDPOINTS ==========
+
+  /**
+   * Login a user with email and password
+   *
+   * @async
+   * @param {string} email - User email
+   * @param {string} password - User password
+   * @returns {Promise<Object>} - Login response with user data
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async login(email, password) {
+    const response = await fetch(`${this.baseURL}/auth/login`, {
+      method: "POST",
+      credentials: "include",
+      headers: this.getHeaders(),
+      body: JSON.stringify({ email, password }),
+    });
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Logout the current user
+   *
+   * @async
+   * @returns {Promise<Object>} - Logout response
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async logout() {
+    const response = await fetch(`${this.baseURL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+      headers: this.getHeaders(),
+    });
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Refresh the access token using the refresh token cookie
+   *
+   * @async
+   * @returns {Promise<Object>} - New token data
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async refreshAccessToken() {
+    const response = await fetch(`${this.baseURL}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+      headers: this.getHeaders(),
+    });
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Get the authenticated user's profile
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to view their profile.
+   * @returns {Promise<Object>} - User profile data
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async getProfile() {
+    const response = await this.authenticatedFetch(`${this.baseURL}/auth/profile`, {
+      method: "GET",
+    });
+    return await this.handleResponse(response);
+  }
+
   // ========== GAMES ENDPOINTS ==========
 
   /**
@@ -129,10 +197,12 @@ class ApiService {
    * @throws {Error} - If the request fails or the response is not successful
    */
   async getGameById(id) {
-    const response = await fetch(`${this.baseURL}/games/${id}`, {
-      method: "GET",
-      headers: this.getHeaders(),
-    });
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${id}`,
+      {
+        method: "GET",
+      },
+    );
 
     return await this.handleResponse(response);
   }
@@ -167,10 +237,30 @@ class ApiService {
    * @throws {Error} If the request fails or the response is not successful.
    */
   async createGame(gameData) {
-    const response = await this.authenticatedFetch(`${this.baseURL}/games`, {
+    const response = await this.authenticatedFetch(`${this.baseURL}/games/create`, {
       method: "POST",
       body: JSON.stringify(gameData),
     });
+
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Leave a game the current user is signed up for
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to leave a game.
+   * @param {string|number} id - The unique identifier of the game to leave.
+   * @returns {Promise<any>} The response data from the server.
+   * @throws {Error} If the request fails or the response is not successful.
+   */
+  async leaveGame(id) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${id}/leave`,
+      {
+        method: "POST",
+      },
+    );
 
     return await this.handleResponse(response);
   }
@@ -235,22 +325,42 @@ class ApiService {
     return await this.handleResponse(response);
   }
 
+  /**
+   * Get historical ELO ratings for a specific user by ID
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to view historical ELO ratings.
+   * @param {string|number} userId - The user ID to get ELO history for
+   * @returns {Promise<Array>} - List of historical ELO ratings
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async getHistoricalEloByUserId(userId) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/history/elo/${userId}`,
+      {
+        method: "GET",
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
   // ========== PLAYER ENDPOINTS ==========
 
   /**
    * Search for players by username
    *
    * @async
+   * @requires Authentication - The user must be logged in to search for players.
    * @param {string} username - The username to search for
    * @returns {Promise<Array>} - List of players matching the search criteria
    * @throws {Error} - If the request fails or the response is not successful
    */
   async findPlayer(username) {
-    const response = await fetch(
+    const response = await this.authenticatedFetch(
       `${this.baseURL}/player/search/${encodeURIComponent(username)}`,
       {
         method: "GET",
-        headers: this.getHeaders(),
       },
     );
 
@@ -261,15 +371,18 @@ class ApiService {
    * Get player profile by ID
    *
    * @async
+   * @requires Authentication - The user must be logged in to view player profiles.
    * @param {number} id - Player ID
    * @returns {Promise<Object>} - Player profile details
    * @throws {Error} - If the request fails or the response is not successful
    */
   async getPlayerProfile(id) {
-    const response = await fetch(`${this.baseURL}/player/profile/${id}`, {
-      method: "GET",
-      headers: this.getHeaders(),
-    });
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/player/profile/${id}`,
+      {
+        method: "GET",
+      },
+    );
 
     return await this.handleResponse(response);
   }

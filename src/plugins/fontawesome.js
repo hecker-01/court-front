@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
   faArrowLeft,
   faBug,
+  faCalendarDays,
   faChartLine,
   faCheck,
   faCheckCircle,
@@ -10,6 +11,7 @@ import {
   faCircleXmark,
   faClipboardList,
   faCreditCard,
+  faCrown,
   faEdit,
   faExclamationCircle,
   faEye,
@@ -28,15 +30,18 @@ import {
   faTimes,
   faTrash,
   faTrashAlt,
+  faTrophy,
   faUniversity,
   faUserCircle,
   faUserPlus,
+  faUsers,
   faWallet,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
   faArrowLeft,
   faBug,
+  faCalendarDays,
   faChartLine,
   faCheck,
   faCheckCircle,
@@ -44,6 +49,7 @@ library.add(
   faCircleXmark,
   faClipboardList,
   faCreditCard,
+  faCrown,
   faEdit,
   faExclamationCircle,
   faEye,
@@ -62,9 +68,11 @@ library.add(
   faTimes,
   faTrash,
   faTrashAlt,
+  faTrophy,
   faUniversity,
   faUserCircle,
   faUserPlus,
+  faUsers,
   faWallet,
 );
 

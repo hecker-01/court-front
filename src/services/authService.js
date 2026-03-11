@@ -39,32 +39,16 @@ class AuthService {
     try {
       const response = await apiService.login(email, password);
 
-      // Check if we got a userId from the login response
-      if (!response.userId && !response.user) {
+      if (!response.user) {
         throw new Error("Login response missing user data.");
       }
 
-      // If we have userId but not full user object, fetch user details
-      let userId = response.userId || response.user?.id;
-      if (userId && !response.user) {
-        const userResponse = await apiService.getUserById(userId);
-        const userData = userResponse.user || userResponse;
-
-        this.currentUser = {
-          id: userData.id || userId,
-          email: userData.email || email,
-          name: userData.name || userData.username,
-          role: userData.role,
-        };
-      } else if (response.user) {
-        // Store user data (excluding sensitive info)
-        this.currentUser = {
-          id: response.user.id,
-          email: response.user.email,
-          name: response.user.name || response.user.username,
-          role: response.user.role,
-        };
-      }
+      this.currentUser = {
+        id: response.user.id,
+        email: response.user.email,
+        name: response.user.name,
+        role: response.user.role,
+      };
 
       this.isLoggedIn = true;
       localStorage.setItem("currentUser", JSON.stringify(this.currentUser));
@@ -91,9 +75,6 @@ class AuthService {
       this.currentUser = null;
       this.isLoggedIn = false;
       localStorage.removeItem("currentUser");
-      localStorage.removeItem("hasUnpaidOrders");
-      localStorage.removeItem("lastUnpaidOrderCheck");
-      window.dispatchEvent(new Event("unpaidOrdersUpdated"));
       return { message: "Logged out successfully" };
     } catch (error) {
       console.error("Logout error:", error);
@@ -101,9 +82,6 @@ class AuthService {
       this.currentUser = null;
       this.isLoggedIn = false;
       localStorage.removeItem("currentUser");
-      localStorage.removeItem("hasUnpaidOrders");
-      localStorage.removeItem("lastUnpaidOrderCheck");
-      window.dispatchEvent(new Event("unpaidOrdersUpdated"));
       throw error;
     }
   }
@@ -175,23 +153,16 @@ class AuthService {
    */
   async verifyAuthentication() {
     try {
-      // Try to get current user info - this will validate the JWT token
-      // We'll use the getUserById endpoint with the current user's ID
-      if (!this.currentUser || !this.currentUser.id) {
-        return false;
-      }
+      // Validate the JWT token by fetching the user's profile
+      const userData = await apiService.getProfile();
 
-      const response = await apiService.getUserById(this.currentUser.id);
-      // Handle both response.user and direct user object
-      const userData = response.user || response;
-
-      if (userData && (userData.id || userData.UserID)) {
+      if (userData && userData.id) {
         // Update local state with fresh data
         this.currentUser = {
-          id: userData.id || userData.UserID,
-          email: userData.email || userData.Email,
-          name: userData.name || userData.username || userData.Username,
-          role: userData.role || userData.Role,
+          id: userData.id,
+          email: userData.email,
+          name: userData.name,
+          role: userData.role,
         };
         this.isLoggedIn = true;
         localStorage.setItem("currentUser", JSON.stringify(this.currentUser));

@@ -25,7 +25,7 @@ const route = useRoute();
 
       <li>
         <router-link
-          to="/History"
+          to="/history"
           class="flex flex-col items-center gap-1.5 px-4 py-2 rounded-lg transition-colors text-gray-400 hover:text-white"
           :class="{
             'text-white': route.name === 'History',

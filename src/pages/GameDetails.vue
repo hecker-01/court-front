@@ -1,101 +1,134 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import apiService from "@/services/apiService.js";
-import { BASE_URL } from "@/services/apiService";
-import Dish from "@/components/Dish.vue";
-import ErrorMessage from '@/components/ErrorMessage.vue'
+import authService from "@/services/authService.js";
+import ErrorMessage from "@/components/ErrorMessage.vue";
 
 const route = useRoute();
-const dish = ref(null);
-const allDishes = ref([]);
+const router = useRouter();
+
+const game = ref(null);
 const isLoading = ref(true);
 const error = ref("");
-const isAddingToCart = ref(false);
-const quantity = ref(1);
+const isSigningUp = ref(false);
 
-const dishId = route.params.id;
+const gameId = route.params.id;
 
-const imageUrl = computed(() => {
-  if (!dish.value?.Image) return null;
+const statusConfig = {
+  planned: { label: "Planned", bg: "bg-racket/20", text: "text-racket" },
+  started: { label: "Started", bg: "bg-status-pending/20", text: "text-status-pending" },
+  ended: { label: "Ended", bg: "bg-status-delivering/20", text: "text-status-delivering" },
+  processed: { label: "Processed", bg: "bg-status-completed/20", text: "text-status-completed" },
+};
 
-  // If it's already a full URL (starts with http), use it as-is
-  if (dish.value.Image.startsWith("http")) {
-    return dish.value.Image;
-  }
-
-  // Otherwise, prepend BASE_URL
-  return BASE_URL + dish.value.Image;
+const statusDisplay = computed(() => {
+  if (!game.value) return statusConfig.planned;
+  return statusConfig[game.value.status] || statusConfig.planned;
 });
 
-const fetchDish = async () => {
+const isUserSignedUp = computed(() => {
+  if (!game.value?.participants || !authService.isAuthenticated()) return false;
+  const currentUser = authService.getCurrentUser();
+  return game.value.participants.some((p) => p.userId === currentUser?.id);
+});
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
+const fetchGame = async () => {
   try {
     isLoading.value = true;
     error.value = "";
-    const response = await apiService.getDishById(dishId);
-    dish.value = response.dish || response;
+    const response = await apiService.getGameById(gameId);
+    game.value = response;
   } catch (err) {
-    console.error("Failed to fetch dish:", err);
-    error.value = err.message || "Failed to load dish details";
+    console.error("Failed to fetch game:", err);
+    if (err.status === 401) {
+      router.push({ name: "Login", query: { redirect: route.fullPath } });
+      return;
+    }
+    if (err.status === 404) {
+      error.value = "Game not found. It may have been removed.";
+    } else {
+      error.value = err.message || "Failed to load game details";
+    }
   } finally {
     isLoading.value = false;
   }
 };
 
-const fetchAllDishes = async () => {
+const handleSignup = async () => {
   try {
-    const response = await apiService.getDishes();
-    allDishes.value = response.dishes || response;
+    isSigningUp.value = true;
+    await apiService.signupGame(gameId);
+    await fetchGame();
   } catch (err) {
-    console.error("Failed to fetch dishes:", err);
+    console.error("Signup failed:", err);
+    if (err.status === 401) {
+      router.push({ name: "Login", query: { redirect: route.fullPath } });
+      return;
+    }
+    error.value = err.message || "Failed to sign up for game";
+  } finally {
+    isSigningUp.value = false;
   }
 };
 
-const recommendedDishes = () => {
-  return allDishes.value
-    .filter((d) => d.DishID !== parseInt(dishId))
-    .slice(0, 4);
-};
-
-const increaseQuantity = () => {
-  quantity.value++;
-};
-
-const decreaseQuantity = () => {
-  if (quantity.value > 1) {
-    quantity.value--;
+const handleLeave = async () => {
+  try {
+    isSigningUp.value = true;
+    await apiService.leaveGame(gameId);
+    await fetchGame();
+  } catch (err) {
+    console.error("Leave failed:", err);
+    if (err.status === 401) {
+      router.push({ name: "Login", query: { redirect: route.fullPath } });
+      return;
+    }
+    error.value = err.message || "Failed to leave game";
+  } finally {
+    isSigningUp.value = false;
   }
-};
-
-const addToCart = () => {
-  const existingItem = getCartItem(dish.value.DishID);
-  const currentQuantity = existingItem ? existingItem.quantity : 0;
-  setCartItem(dish.value.DishID, currentQuantity + quantity.value);
-
-  // Show feedback
-  isAddingToCart.value = true;
-  setTimeout(() => {
-    isAddingToCart.value = false;
-  }, 600);
 };
 
 onMounted(() => {
-  fetchDish();
-  fetchAllDishes();
+  fetchGame();
 });
 </script>
 
 <template>
   <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
-      <!-- Loading State -->
+      <!-- Loading Skeleton -->
       <div v-if="isLoading" class="bg-charcoal shadow rounded-lg p-8">
         <div class="animate-pulse space-y-6">
-          <div class="h-64 bg-asphalt-light rounded"></div>
+          <div class="flex items-center justify-between">
+            <div class="h-9 bg-asphalt-light rounded w-1/3"></div>
+            <div class="h-6 bg-asphalt-light rounded-full w-20"></div>
+          </div>
+          <div class="h-4 bg-asphalt-light rounded w-2/3"></div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="h-16 bg-asphalt-light rounded"></div>
+            <div class="h-16 bg-asphalt-light rounded"></div>
+            <div class="h-16 bg-asphalt-light rounded"></div>
+            <div class="h-16 bg-asphalt-light rounded"></div>
+          </div>
+          <div class="h-10 bg-asphalt-light rounded w-32"></div>
           <div class="space-y-3">
-            <div class="h-8 bg-asphalt-light rounded w-1/3"></div>
-            <div class="h-4 bg-asphalt-light rounded"></div>
-            <div class="h-4 bg-asphalt-light rounded w-5/6"></div>
+            <div class="h-6 bg-asphalt-light rounded w-40"></div>
+            <div class="h-12 bg-asphalt-light rounded"></div>
+            <div class="h-12 bg-asphalt-light rounded"></div>
           </div>
         </div>
       </div>
@@ -103,117 +136,124 @@ onMounted(() => {
       <!-- Error State -->
       <ErrorMessage
         v-else-if="error"
-        title="Error loading dish"
+        title="Error loading game"
         :message="error"
-        hint="We couldn't load this dish. It may no longer be available."
+        hint="We couldn't load this game. It may no longer be available."
         retry-label="Try again"
-        @retry="fetchDish"
+        @retry="fetchGame"
       />
 
-      <!-- Dish Details -->
-      <div v-else-if="dish" class="space-y-8">
-        <!-- Dish Image and Info -->
-        <div class="bg-charcoal shadow rounded-lg overflow-hidden">
-          <div class="md:flex">
-            <div class="md:w-1/2">
-              <div class="relative">
-                <img
-                  v-if="imageUrl"
-                  :src="imageUrl"
-                  :alt="dish.Name"
-                  class="w-full h-64 md:h-96 object-cover"
-                  draggable="false"
-                />
-                <div
-                  v-else
-                  class="flex items-center justify-center h-64 md:h-96 bg-asphalt"
-                >
-                  <div class="text-center">
-                    <img
-                      src="/favicon.svg"
-                      alt="No image"
-                      class="w-16 h-16 mx-auto opacity-50 filter grayscale"
-                      draggable="false"
-                    />
-                    <p class="mt-2 text-asphalt-muted">No Image</p>
-                  </div>
-                </div>
-              </div>
+      <!-- Game Details -->
+      <div v-else-if="game" class="space-y-6">
+        <div class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
+          <!-- Header: name + status -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <h1 class="text-3xl font-bold text-snow">{{ game.name }}</h1>
+            <span
+              class="self-start shrink-0 px-3 py-1 rounded-full text-sm font-medium"
+              :class="[statusDisplay.bg, statusDisplay.text]"
+            >
+              {{ statusDisplay.label }}
+            </span>
+          </div>
+
+          <!-- Description -->
+          <p v-if="game.description" class="text-snow-dim leading-relaxed mb-6">
+            {{ game.description }}
+          </p>
+
+          <!-- Info Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div class="bg-asphalt rounded-lg p-4">
+              <p class="text-xs font-medium text-asphalt-muted uppercase tracking-wide mb-1">Planned</p>
+              <p class="text-snow text-sm font-medium">{{ formatDate(game.plannedAt) || "TBD" }}</p>
             </div>
-            <div class="md:w-1/2 p-6 md:p-8">
-              <h1 class="text-3xl font-bold text-snow mb-4">
-                {{ dish.Name }}
-              </h1>
-              <div class="mb-6">
-                <h2 class="text-lg font-semibold text-snow-dim mb-2">
-                  Ingredients
-                </h2>
-                <p class="text-snow-dim leading-relaxed">
-                  {{ dish.Ingredients }}
-                </p>
-              </div>
+            <div v-if="game.startedAt" class="bg-asphalt rounded-lg p-4">
+              <p class="text-xs font-medium text-asphalt-muted uppercase tracking-wide mb-1">Started</p>
+              <p class="text-snow text-sm font-medium">{{ formatDate(game.startedAt) }}</p>
+            </div>
+            <div v-if="game.endedAt" class="bg-asphalt rounded-lg p-4">
+              <p class="text-xs font-medium text-asphalt-muted uppercase tracking-wide mb-1">Ended</p>
+              <p class="text-snow text-sm font-medium">{{ formatDate(game.endedAt) }}</p>
+            </div>
+            <div class="bg-asphalt rounded-lg p-4">
+              <p class="text-xs font-medium text-asphalt-muted uppercase tracking-wide mb-1">Players</p>
+              <p class="text-snow text-sm font-medium">{{ game.participants?.length ?? 0 }}</p>
+            </div>
+          </div>
 
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-2xl font-bold text-turf"
-                  >${{ dish.Price?.toFixed(2) }}</span
-                >
-              </div>
-
-              <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 bg-charcoal border border-asphalt-light rounded-lg p-1">
-                  <button
-                    class="bg-transparent border-0 w-8 h-8 flex items-center justify-center cursor-pointer text-racket rounded transition-colors duration-200 hover:bg-asphalt-light disabled:opacity-50 disabled:cursor-not-allowed"
-                    @click="decreaseQuantity"
-                    :disabled="quantity <= 1"
-                    aria-label="Decrease quantity"
-                  >
-                    <font-awesome-icon icon="minus" />
-                  </button>
-                  <span class="text-[1.1rem] font-semibold min-w-[2.5rem] text-center text-snow">{{ quantity }}</span>
-                  <button
-                    class="bg-transparent border-0 w-8 h-8 flex items-center justify-center cursor-pointer text-racket rounded transition-colors duration-200 hover:bg-asphalt-light disabled:opacity-50 disabled:cursor-not-allowed"
-                    @click="increaseQuantity"
-                    aria-label="Increase quantity"
-                  >
-                    <font-awesome-icon icon="plus" />
-                  </button>
-                </div>
-
+          <!-- Signup / Leave Section -->
+          <div class="mb-6">
+            <template v-if="authService.isAuthenticated()">
+              <template v-if="game.status === 'planned'">
                 <button
-                  class="px-4 py-2 bg-racket text-white border-0 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 whitespace-nowrap min-w-[110px] hover:bg-racket-hover disabled:opacity-50 disabled:cursor-not-allowed"
-                  :class="{ 'bg-turf scale-95': isAddingToCart }"
-                  :disabled="isAddingToCart"
-                  @click="addToCart"
+                  v-if="!isUserSignedUp"
+                  class="px-6 py-2.5 bg-racket text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                  :disabled="isSigningUp"
+                  @click="handleSignup"
                 >
-                  <span v-if="!isAddingToCart" class="flex items-center justify-center gap-2">
-                    <font-awesome-icon icon="shopping-cart" />
-                    <span>Add to Cart</span>
-                  </span>
-                  <span v-else class="flex items-center justify-center gap-2">
-                    <font-awesome-icon icon="check" />
-                    <span>Added!</span>
-                  </span>
+                  {{ isSigningUp ? "Signing up…" : "Sign Up" }}
                 </button>
-              </div>
-            </div>
+                <button
+                  v-else
+                  class="px-6 py-2.5 bg-danger-solid text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-danger-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                  :disabled="isSigningUp"
+                  @click="handleLeave"
+                >
+                  {{ isSigningUp ? "Leaving…" : "Leave Game" }}
+                </button>
+              </template>
+              <p v-else-if="game.status === 'started'" class="text-status-pending text-sm font-medium">
+                🏐 Game in progress
+              </p>
+              <p v-else class="text-snow-dim text-sm">
+                This game has ended.
+              </p>
+            </template>
+            <router-link
+              v-else
+              :to="{ name: 'Login', query: { redirect: $route.fullPath } }"
+              class="inline-block px-6 py-2.5 bg-racket text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover no-underline"
+            >
+              Sign in to join
+            </router-link>
           </div>
         </div>
 
-        <!-- You May Also Like -->
-        <div
-          v-if="recommendedDishes().length > 0"
-          class="bg-charcoal shadow rounded-lg p-6"
-        >
-          <h2 class="text-2xl font-bold text-snow mb-6">
-            You May Also Like
+        <!-- Participants Section -->
+        <div class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
+          <h2 class="text-xl font-bold text-snow mb-4">
+            Participants ({{ game.participants?.length ?? 0 }})
           </h2>
-          <div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 mt-6 overflow-visible">
-            <Dish
-              v-for="recommendedDish in recommendedDishes()"
-              :key="recommendedDish.DishID"
-              :dish="recommendedDish"
-            />
+
+          <div v-if="game.participants?.length" class="space-y-3">
+            <div
+              v-for="participant in game.participants"
+              :key="participant.id"
+              class="flex items-center justify-between bg-asphalt rounded-lg px-4 py-3"
+              :class="{ 'ring-1 ring-status-completed': game.winnerUserId && participant.userId === game.winnerUserId }"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-asphalt-light flex items-center justify-center text-snow text-sm font-semibold uppercase">
+                  {{ participant.username?.charAt(0) || "?" }}
+                </div>
+                <span class="text-snow font-medium">{{ participant.username }}</span>
+                <span
+                  v-if="game.winnerUserId && participant.userId === game.winnerUserId"
+                  class="text-xs font-medium text-status-completed bg-status-completed/20 px-2 py-0.5 rounded-full"
+                >
+                  <font-awesome-icon icon="crown" class="mr-1" /> Winner
+                </span>
+              </div>
+              <span v-if="participant.score != null" class="text-snow-dim text-sm font-mono">
+                {{ participant.score }} pts
+              </span>
+            </div>
           </div>
+
+          <p v-else class="text-asphalt-muted text-sm">
+            No participants yet. Be the first to sign up!
+          </p>
         </div>
       </div>
     </div>

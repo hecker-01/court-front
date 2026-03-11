@@ -20,6 +20,7 @@ export default defineConfig({
             "@fortawesome/free-solid-svg-icons",
             "@fortawesome/vue-fontawesome",
           ],
+          chartjs: ["chart.js"],
         },
       },
     },

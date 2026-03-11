@@ -22,7 +22,7 @@ export default {
         turf: "#3a7d44",
         "turf-hover": "#2d6336",
         // Accent
-        ball: "#c8d400",
+        ball: "#ff9800",
         // Light text on dark backgrounds
         snow: "#f0f0f0",
         "snow-dim": "#9ca3af",

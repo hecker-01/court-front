@@ -173,9 +173,7 @@ onMounted(() => {
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-snow"
-                  >Email</label
-                >
+                <label class="block text-sm font-medium text-snow">Email</label>
                 <p class="mt-1 text-lg text-snow">
                   {{ user.email || "N/A" }}
                 </p>
@@ -191,6 +189,13 @@ onMounted(() => {
               </div>
 
               <div>
+                <label class="block text-sm font-medium text-snow">ELO Rating</label>
+                <p class="mt-1 text-2xl font-bold text-ball">
+                  {{ user.elo ?? 1000 }}
+                </p>
+              </div>
+
+              <div>
                 <label class="block text-sm font-medium text-snow"
                   >Account Type</label
                 >
@@ -200,6 +205,13 @@ onMounted(() => {
                   >
                     {{ user.role || "User" }}
                   </span>
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-snow">Member Since</label>
+                <p class="mt-1 text-lg text-snow">
+                  {{ user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A' }}
                 </p>
               </div>
             </div>
@@ -234,9 +246,7 @@ onMounted(() => {
               </div>
 
               <div>
-                <label
-                  for="email"
-                  class="block text-sm font-medium text-snow"
+                <label for="email" class="block text-sm font-medium text-snow"
                   >Email <span class="text-danger">*</span></label
                 >
                 <input
@@ -306,7 +316,7 @@ onMounted(() => {
               'w-full sm:flex-1 px-6 py-2 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center gap-2',
               isAdmin()
                 ? 'bg-asphalt-light text-asphalt-muted cursor-not-allowed'
-                : 'bg-racket text-white hover:bg-racket-hover focus:ring-racket',
+                : 'bg-danger text-white hover:bg-danger-hover focus:ring-danger',
             ]"
             :title="
               isAdmin()
@@ -341,7 +351,7 @@ onMounted(() => {
             </button>
             <button
               @click="handleDeleteAccount"
-              class="px-4 py-2 bg-racket text-white font-medium rounded-md hover:bg-racket-hover"
+              class="px-4 py-2 bg-danger text-white font-medium rounded-md hover:bg-danger-hover focus:ring-danger"
             >
               Delete Account
             </button>
@@ -351,5 +361,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped></style>
