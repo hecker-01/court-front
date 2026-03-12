@@ -218,7 +218,7 @@ onMounted(() => {
               <div>
                 <h2 class="text-xl font-bold text-snow">Find a player</h2>
                 <p class="mt-1 text-sm text-snow-dim">
-                  Look up any player by username.
+                  Look up any player by name.
                 </p>
               </div>
               <font-awesome-icon
@@ -233,13 +233,13 @@ onMounted(() => {
                   for="player-search"
                   class="block text-sm font-medium text-snow"
                 >
-                  Username
+                  Name
                 </label>
                 <input
                   id="player-search"
                   v-model="searchQuery"
                   type="text"
-                  placeholder="Start typing a username"
+                  placeholder="Start typing a name"
                   class="w-full rounded-md border border-asphalt-light bg-asphalt px-3 py-2 text-snow placeholder:text-asphalt-muted focus:border-racket focus:outline-none"
                 />
 
