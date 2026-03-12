@@ -50,6 +50,10 @@ const fetchGameDetails = async () => {
   }
 };
 
+const navigateToProfile = (userId) => {
+  router.push(`/profile/${userId}`)
+}
+
 onMounted(() => {
   fetchGameDetails();
 });
@@ -134,6 +138,8 @@ onMounted(() => {
             value-field="score"
             value-label="pts"
             empty-text="No participants recorded."
+            :clickable="true"
+            @player-click="navigateToProfile"
           />
         </div>
       </div>

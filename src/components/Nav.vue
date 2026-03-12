@@ -2,6 +2,33 @@
 import { useRoute } from "vue-router";
 
 const route = useRoute();
+
+const navItems = [
+  {
+    to: "/",
+    label: "Home",
+    icon: "house",
+    names: ["Home"],
+  },
+  {
+    to: "/leaderboard",
+    label: "Leaderboard",
+    icon: "trophy",
+    names: ["Leaderboard", "ProfileDetails"],
+  },
+  {
+    to: "/history",
+    label: "History",
+    icon: "chart-line",
+    names: ["History"],
+  },
+  {
+    to: "/account",
+    label: "Account",
+    icon: "user-circle",
+    names: ["Account"],
+  },
+];
 </script>
 
 <template>
@@ -9,43 +36,15 @@ const route = useRoute();
     class="fixed bottom-0 left-0 right-0 z-50 bg-charcoal text-white shadow-md"
     :class="{ hidden: route.name === 'NotFound' }"
   >
-    <ul class="flex justify-around items-center py-3">
-      <li>
+    <ul class="grid grid-cols-4 items-center gap-1 px-2 py-2 sm:px-4">
+      <li v-for="item in navItems" :key="item.to" class="min-w-0">
         <router-link
-          to="/"
-          class="flex flex-col items-center gap-1.5 px-4 py-2 rounded-lg transition-colors text-gray-400 hover:text-white"
-          :class="{
-            'text-white': route.name === 'Home',
-          }"
+          :to="item.to"
+          class="flex min-w-0 flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors text-gray-400 hover:text-white"
+          :class="{ 'text-white': item.names.includes(route.name) }"
         >
-          <font-awesome-icon icon="house" class="text-2xl" />
-          <span class="text-xs">Home</span>
-        </router-link>
-      </li>
-
-      <li>
-        <router-link
-          to="/history"
-          class="flex flex-col items-center gap-1.5 px-4 py-2 rounded-lg transition-colors text-gray-400 hover:text-white"
-          :class="{
-            'text-white': route.name === 'History',
-          }"
-        >
-          <font-awesome-icon icon="chart-line" class="text-2xl" />
-          <span class="text-xs">History</span>
-        </router-link>
-      </li>
-
-      <li>
-        <router-link
-          to="/account"
-          class="flex flex-col items-center gap-1.5 px-4 py-2 rounded-lg transition-colors text-gray-400 hover:text-white"
-          :class="{
-            'text-white': route.name === 'Account',
-          }"
-        >
-          <font-awesome-icon icon="user-circle" class="text-2xl" />
-          <span class="text-xs">Account</span>
+          <font-awesome-icon :icon="item.icon" class="text-xl sm:text-2xl" />
+          <span class="truncate text-[11px] leading-none sm:text-xs">{{ item.label }}</span>
         </router-link>
       </li>
     </ul>

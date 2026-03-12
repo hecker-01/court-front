@@ -164,9 +164,12 @@ class ApiService {
    * @throws {Error} - If the request fails or the response is not successful
    */
   async getProfile() {
-    const response = await this.authenticatedFetch(`${this.baseURL}/auth/profile`, {
-      method: "GET",
-    });
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/auth/profile`,
+      {
+        method: "GET",
+      },
+    );
     return await this.handleResponse(response);
   }
 
@@ -237,10 +240,13 @@ class ApiService {
    * @throws {Error} If the request fails or the response is not successful.
    */
   async createGame(gameData) {
-    const response = await this.authenticatedFetch(`${this.baseURL}/games/create`, {
-      method: "POST",
-      body: JSON.stringify(gameData),
-    });
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/create`,
+      {
+        method: "POST",
+        body: JSON.stringify(gameData),
+      },
+    );
 
     return await this.handleResponse(response);
   }
@@ -348,6 +354,22 @@ class ApiService {
   // ========== PLAYER ENDPOINTS ==========
 
   /**
+   * Get the public player leaderboard
+   *
+   * @async
+   * @returns {Promise<Array>} - Top players ordered by ELO
+   * @throws {Error} - If the request fails or the response is not successful
+   */
+  async getLeaderboard() {
+    const response = await fetch(`${this.baseURL}/player/leaderboard`, {
+      method: "GET",
+      headers: this.getHeaders(),
+    });
+
+    return await this.handleResponse(response);
+  }
+
+  /**
    * Search for players by username
    *
    * @async
@@ -356,7 +378,7 @@ class ApiService {
    * @returns {Promise<Array>} - List of players matching the search criteria
    * @throws {Error} - If the request fails or the response is not successful
    */
-  async findPlayer(username) {
+  async searchPlayers(username) {
     const response = await this.authenticatedFetch(
       `${this.baseURL}/player/search/${encodeURIComponent(username)}`,
       {
@@ -378,7 +400,7 @@ class ApiService {
    */
   async getPlayerProfile(id) {
     const response = await this.authenticatedFetch(
-      `${this.baseURL}/player/profile/${id}`,
+      `${this.baseURL}/player/profile/${encodeURIComponent(id)}`,
       {
         method: "GET",
       },

@@ -5,10 +5,12 @@ import appConfig from "@/config/appConfig.js";
 const Home = () => import("@/pages/Home.vue");
 const Login = () => import("@/pages/Login.vue");
 const Signup = () => import("@/pages/Signup.vue");
+const Leaderboard = () => import("@/pages/Leaderboard.vue");
 const History = () => import("@/pages/History.vue");
 const HistoryDetails = () => import("@/pages/HistoryDetails.vue");
 const GameDetails = () => import("@/pages/GameDetails.vue");
 const Account = () => import("@/pages/Account.vue");
+const ProfileDetails = () => import("@/pages/ProfileDetails.vue");
 const NotFound = () => import("@/pages/NotFound.vue");
 
 const routes = [
@@ -29,6 +31,12 @@ const routes = [
     name: "Signup",
     component: Signup,
     meta: { title: `Sign Up • ${appConfig.name}` },
+  },
+  {
+    path: "/leaderboard",
+    name: "Leaderboard",
+    component: Leaderboard,
+    meta: { title: `Leaderboard • ${appConfig.name}` },
   },
   {
     path: "/history",
@@ -60,6 +68,15 @@ const routes = [
     component: Account,
     meta: {
       title: `Account • ${appConfig.name}`,
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/profile/:id",
+    name: "ProfileDetails",
+    component: ProfileDetails,
+    meta: {
+      title: `Profile • ${appConfig.name}`,
       requiresAuth: true,
     },
   },

@@ -105,6 +105,10 @@ const handleLeave = async () => {
   }
 };
 
+const navigateToProfile = (userId) => {
+  router.push(`/profile/${userId}`)
+}
+
 onMounted(() => {
   fetchGame();
 });
@@ -242,6 +246,8 @@ onMounted(() => {
             value-field="elo"
             value-label="ELO"
             empty-text="No players have signed up yet."
+            :clickable="true"
+            @player-click="navigateToProfile"
           />
         </div>
       </div>

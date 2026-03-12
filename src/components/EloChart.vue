@@ -23,6 +23,7 @@ Chart.register(
 
 const props = defineProps({
   eloData: { type: Object, required: true },
+  nested: { type: Boolean, default: false },
 });
 
 const canvas = ref(null);
@@ -130,8 +131,8 @@ watch(
 </script>
 
 <template>
-  <div class="bg-charcoal rounded-lg p-6">
-    <h2 class="text-lg font-semibold text-snow mb-4">
+  <div :class="['rounded-lg p-6', nested ? 'bg-asphalt' : 'bg-charcoal']">
+    <h2 v-if="!nested" class="text-lg font-semibold text-snow mb-4">
       Current ELO: {{ eloData.currentElo }}
     </h2>
     <div v-if="hasHistory()" class="relative h-64">
