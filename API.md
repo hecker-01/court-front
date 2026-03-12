@@ -277,6 +277,31 @@ Delete a user account.
 
 ## Players `/api/player/*`
 
+### `GET /api/player/leaderboard` (public)
+
+Fetch the top 50 players based on their ELO ratings.
+
+**200 OK**
+
+```json
+[
+  {
+    "id": 3,
+    "rank": 1,
+    "name": "bram",
+    "elo": 1024
+  },
+  {
+    "id": 5,
+    "rank": 2,
+    "name": "alice",
+    "elo": 980
+  }
+]
+```
+
+Returns an empty array if no players are found.
+
 ### `GET /api/player/search/:username` (auth required)
 
 Search for players by username (partial match).
