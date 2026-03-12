@@ -66,18 +66,9 @@ const handleLogin = async () => {
         <h2 class="mt-6 text-center text-3xl font-extrabold text-snow">
           Sign in to your account
         </h2>
-        <p class="mt-2 text-center text-sm text-snow-dim">
-          Or
-          <router-link
-            to="/signup"
-            class="font-medium text-racket hover:text-racket-hover"
-          >
-            create a new account
-          </router-link>
-        </p>
       </div>
 
-      <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
+      <form class="mt-4 space-y-6" @submit.prevent="handleLogin">
         <div class="space-y-4">
           <FormInput
             id="email"
@@ -106,7 +97,7 @@ const handleLogin = async () => {
           :hint="error"
         />
 
-        <div>
+        <div class="space-y-3">
           <button
             type="submit"
             :disabled="isLoading"
@@ -116,6 +107,16 @@ const handleLogin = async () => {
             <font-awesome-icon v-else icon="sign-in-alt" />
             <span>{{ isLoading ? "Signing in..." : "Sign in" }}</span>
           </button>
+
+          <p class="text-center text-sm text-snow-dim">
+            Or
+            <router-link
+              to="/signup"
+              class="font-medium text-racket hover:text-racket-hover"
+            >
+              create a new account
+            </router-link>
+          </p>
         </div>
       </form>
     </div>

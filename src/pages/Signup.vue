@@ -104,10 +104,10 @@ const handleSignup = async () => {
           <FormInput
             id="username"
             v-model="formData.username"
-            label="Username"
+            label="Name"
             :required="true"
             :disabled="isLoading"
-            placeholder="Username"
+            placeholder="Name"
           />
           <FormInput
             id="email"

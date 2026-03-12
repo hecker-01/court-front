@@ -155,7 +155,7 @@ onMounted(() => {
               <!-- Profile Fields -->
               <div class="flex-1 space-y-5">
                 <div>
-                  <p class="text-xs text-asphalt-muted mb-1">Username</p>
+                  <p class="text-xs text-asphalt-muted mb-1">Name</p>
                   <p class="text-snow">
                     {{ user.username || user.name || "N/A" }}
                   </p>
@@ -175,7 +175,12 @@ onMounted(() => {
                   </p>
                 </div>
 
-                <div>
+                <div class="sm:hidden">
+                  <p class="text-xs text-asphalt-muted mb-1">ELO Rating</p>
+                  <p class="text-snow font-semibold">{{ user.elo ?? 1000 }}</p>
+                </div>
+
+                <div v-if="isAdmin()">
                   <p class="text-xs text-asphalt-muted mb-1">Account Type</p>
                   <p class="text-snow capitalize">
                     {{ user.role || "User" }}
@@ -201,7 +206,7 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- ELO Feature (right side, hidden on small screens) -->
+              <!-- Avatar + ELO (right side, hidden on small screens) -->
               <div
                 class="hidden sm:flex flex-col items-center justify-center px-6 border-l border-asphalt-light min-w-[160px]"
               >
@@ -217,14 +222,6 @@ onMounted(() => {
                 </p>
                 <p class="text-xs text-asphalt-muted mt-1">ELO Rating</p>
               </div>
-            </div>
-
-            <!-- ELO inline on mobile only -->
-            <div class="sm:hidden mt-5">
-              <p class="text-xs text-asphalt-muted mb-1">ELO Rating</p>
-              <p class="text-lg font-semibold text-snow">
-                {{ user.elo ?? 1000 }}
-              </p>
             </div>
           </div>
 
@@ -244,7 +241,7 @@ onMounted(() => {
               <FormInput
                 id="username"
                 v-model="editForm.username"
-                label="Username"
+                label="Name"
                 required
               />
               <FormInput
@@ -302,10 +299,10 @@ onMounted(() => {
             @click="showDeleteConfirm = true"
             :disabled="isAdmin()"
             :class="[
-              'px-5 py-2 font-medium rounded-md',
+              'text-xs',
               isAdmin()
-                ? 'text-asphalt-muted cursor-not-allowed bg-asphalt-light'
-                : 'text-snow hover:bg-danger-hover bg-danger',
+                ? 'text-snow-dim cursor-not-allowed'
+                : 'text-snow-dim hover:text-danger',
             ]"
             :title="
               isAdmin()
@@ -313,7 +310,6 @@ onMounted(() => {
                 : 'Delete account'
             "
           >
-            <FontAwesomeIcon icon="trash-alt" class="mr-1" />
             Delete Account
           </button>
         </div>
