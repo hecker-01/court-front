@@ -24,6 +24,7 @@ jobs:
           npm ci
           npm run build
           cp dist/index.html dist/404.html
+          echo "ErrorDocument 404 /index.html" > dist/.htaccess
 
       - name: Preserve build output
         run: |
