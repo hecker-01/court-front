@@ -27,7 +27,7 @@ jobs:
       - name: Prepare for SPA hosting
         run: |
           cp dist/index.html dist/404.html
-          cp .htaccess dist/.htaccess
+          echo "ErrorDocument 404 /index.html" > dist/.htaccess
 
       - name: Preserve build output
         run: |
@@ -55,5 +55,6 @@ jobs:
       - name: Commit and push
         run: |
           git add .
+          git add -f .htaccess
           git commit -m "Production build from master (${GITHUB_SHA})" || echo "No changes"
           git push origin production
