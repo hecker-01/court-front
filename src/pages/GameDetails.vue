@@ -6,6 +6,7 @@ import authService from "@/services/authService.js";
 import { formatDate } from "@/utils/formatters.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import GameInfoGrid from "@/components/GameInfoGrid.vue";
+import GameSchedule from "@/components/GameSchedule.vue";
 import PlayerList from "@/components/PlayerList.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -49,12 +50,35 @@ const isUserSignedUp = computed(() => {
   return game.value.participants.some((p) => p.userId === currentUser?.id);
 });
 
+const currentUserId = computed(() => {
+  return authService.getCurrentUser()?.id ?? null;
+});
+
+const hasSchedule = computed(() => {
+  return (
+    authService.isAuthenticated() &&
+    game.value?.schedule?.rounds?.length > 0
+  );
+});
+
 const fetchGame = async () => {
   try {
     isLoading.value = true;
     error.value = "";
-    const response = await apiService.getGameById(gameId);
-    game.value = response;
+
+    if (authService.isAuthenticated()) {
+      const response = await apiService.getGameById(gameId);
+      game.value = response;
+    } else {
+      // Public fallback: fetch from the public games list
+      const games = await apiService.getGames();
+      const found = games.find((g) => String(g.id) === String(gameId));
+      if (!found) {
+        error.value = "Game not found. It may have been removed.";
+        return;
+      }
+      game.value = found;
+    }
   } catch (err) {
     console.error("Failed to fetch game:", err);
     if (err.status === 401) {
@@ -235,7 +259,7 @@ onMounted(() => {
         </div>
 
         <!-- Participants Section -->
-        <div class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
+        <div v-if="game.participants" class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
           <h2 class="text-xl font-bold text-snow mb-4">
             Participants ({{ game.participants?.length ?? 0 }})
           </h2>
@@ -247,6 +271,20 @@ onMounted(() => {
             value-label="ELO"
             empty-text="No players have signed up yet."
             :clickable="true"
+            @player-click="navigateToProfile"
+          />
+        </div>
+
+        <!-- Schedule Section -->
+        <div v-if="hasSchedule" class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
+          <h2 class="text-xl font-bold text-snow mb-4">
+            <font-awesome-icon icon="clipboard-list" class="mr-2 text-racket" />
+            Schedule
+          </h2>
+
+          <GameSchedule
+            :schedule="game.schedule"
+            :current-user-id="currentUserId"
             @player-click="navigateToProfile"
           />
         </div>

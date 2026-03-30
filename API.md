@@ -210,6 +210,41 @@ See [Auth -> Register](#post-apiauthregister).
 
 ---
 
+### `GET /api/users` (admin required)
+
+Fetch all users.
+
+Requires an authenticated user with `admin` role.
+
+**200 OK**
+
+```json
+[
+  {
+    "id": 1,
+    "email": "admin@example.com",
+    "name": "admin",
+    "role": "admin",
+    "elo": 1200,
+    "phone_number": "+31 6 12345678",
+    "createdAt": "2026-03-11T08:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "email": "user@example.com",
+    "name": "username",
+    "role": "user",
+    "elo": 1024,
+    "phone_number": null,
+    "createdAt": "2026-03-11T08:00:00.000Z"
+  }
+]
+```
+
+**403 Forbidden** - authenticated user is not an admin.
+
+---
+
 ### `GET /api/users/:id` (auth required)
 
 Fetch a user by ID.
@@ -277,31 +312,6 @@ Delete a user account.
 
 ## Players `/api/player/*`
 
-### `GET /api/player/leaderboard` (public)
-
-Fetch the top 50 players based on their ELO ratings.
-
-**200 OK**
-
-```json
-[
-  {
-    "id": 3,
-    "rank": 1,
-    "name": "bram",
-    "elo": 1024
-  },
-  {
-    "id": 5,
-    "rank": 2,
-    "name": "alice",
-    "elo": 980
-  }
-]
-```
-
-Returns an empty array if no players are found.
-
 ### `GET /api/player/search/:username` (auth required)
 
 Search for players by username (partial match).
@@ -354,6 +364,31 @@ If an admin makes the request, the full profile is returned. If a regular user m
 
 **404 Not Found**
 
+### `GET /api/player/leaderboard` (public)
+
+Fetch the top 50 players based on their ELO ratings.
+
+**200 OK**
+
+` ` `json
+[
+  {
+    "id": 3,
+    "rank": 1,
+    "name": "bram",
+    "elo": 1024
+  },
+  {
+    "id": 5,
+    "rank": 2,
+    "name": "alice",
+    "elo": 980
+  }
+]
+` ` `
+
+Returns an empty array if no players are found.
+
 ---
 
 ## Games `/api/games/*`
@@ -389,7 +424,7 @@ List all **planned** games with signup count and average elo.
 
 ### `GET /api/games/:id` (auth required)
 
-Get full game details including all participants and their elo ratings.
+Get full game details including all participants, round matchups, and field assignments.
 
 **200 OK**
 
@@ -411,6 +446,86 @@ Get full game details including all participants and their elo ratings.
       "userId": 3,
       "username": "bram",
       "elo": 1050
+    }
+  ],
+  "schedule": {
+    "rounds": [
+      {
+        "round": 1,
+        "matches": [
+          {
+            "field": 1,
+            "playerA": { "userId": 3, "username": "bram" },
+            "playerB": { "userId": 5, "username": "sara" }
+          }
+        ],
+        "byes": []
+      }
+    ],
+    "playerRounds": [
+      {
+        "userId": 3,
+        "username": "bram",
+        "rounds": [
+          {
+            "round": 1,
+            "opponent": { "userId": 5, "username": "sara" },
+            "field": 1,
+            "isBye": false
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**404 Not Found**
+
+---
+
+### `GET /api/games/:id/schedule` (auth required)
+
+Get only the schedule view for a game: rounds, opponents, and field assignments.
+
+**200 OK**
+
+```json
+{
+  "gameId": 1,
+  "name": "Friday Session",
+  "status": "started",
+  "participantCount": 4,
+  "rounds": [
+    {
+      "round": 1,
+      "matches": [
+        {
+          "field": 1,
+          "playerA": { "userId": 3, "username": "bram" },
+          "playerB": { "userId": 5, "username": "sara" }
+        },
+        {
+          "field": 2,
+          "playerA": { "userId": 7, "username": "mike" },
+          "playerB": { "userId": 9, "username": "nina" }
+        }
+      ],
+      "byes": []
+    }
+  ],
+  "playerRounds": [
+    {
+      "userId": 3,
+      "username": "bram",
+      "rounds": [
+        {
+          "round": 1,
+          "opponent": { "userId": 5, "username": "sara" },
+          "field": 1,
+          "isBye": false
+        }
+      ]
     }
   ]
 }
@@ -732,9 +847,10 @@ Returns `{ "userId": n, "currentElo": 1000, "history": [] }` when no games have 
 
 Get the ELO history for any user.
 
+- Any authenticated user can request this endpoint.
+
 **200 OK** - same shape as `GET /api/history/elo`.
 
-**403 Forbidden** - non-admin requesting another user's history.
 **404 Not Found** - user does not exist.
 
 ---

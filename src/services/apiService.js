@@ -252,6 +252,26 @@ class ApiService {
   }
 
   /**
+   * Get the schedule for a game (rounds, matches, field assignments)
+   *
+   * @async
+   * @requires Authentication - The user must be logged in to view game schedules.
+   * @param {string|number} id - The unique identifier of the game.
+   * @returns {Promise<Object>} The schedule data with rounds and playerRounds.
+   * @throws {Error} If the request fails or the response is not successful.
+   */
+  async getGameSchedule(id) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${id}/schedule`,
+      {
+        method: "GET",
+      },
+    );
+
+    return await this.handleResponse(response);
+  }
+
+  /**
    * Leave a game the current user is signed up for
    *
    * @async
