@@ -41,9 +41,9 @@ const mySchedule = computed(() => {
             Round {{ round.round }}
           </span>
 
-          <template v-if="round.isBye">
+          <template v-if="round.isSittingOut">
             <span class="text-sm text-asphalt-muted italic"
-              >Bye — no match</span
+              >Sitting out - no match</span
             >
           </template>
           <template v-else>
@@ -161,9 +161,9 @@ const mySchedule = computed(() => {
             </div>
           </div>
 
-          <!-- Byes -->
+          <!-- Sitting out -->
           <div
-            v-for="bye in round.byes"
+            v-for="bye in round.sittingOut"
             :key="bye.userId"
             class="flex items-center gap-3 px-4 py-3 border-t border-asphalt-light"
           >
@@ -171,7 +171,7 @@ const mySchedule = computed(() => {
               class="shrink-0 w-7 h-7 rounded bg-asphalt-light flex items-center justify-center text-xs font-semibold text-snow-dim"
               title="No field assigned"
             >
-              —
+              -
             </span>
             <button
               type="button"
