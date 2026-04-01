@@ -51,8 +51,8 @@ const fetchGameDetails = async () => {
 };
 
 const navigateToProfile = (userId) => {
-  router.push(`/profile/${userId}`)
-}
+  router.push(`/profile/${userId}`);
+};
 
 onMounted(() => {
   fetchGameDetails();
@@ -116,7 +116,7 @@ onMounted(() => {
               class="px-3 py-1 text-sm font-semibold rounded-lg capitalize"
               :class="getStatusClasses(game.status)"
             >
-              {{ game.status === 'processed' ? 'Ended' : game.status }}
+              {{ game.status === "processed" ? "Ended" : game.status }}
             </span>
           </div>
 

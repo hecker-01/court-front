@@ -72,7 +72,7 @@ const sortedParticipants = computed(() => {
               </span>
             </td>
             <td class="py-3 text-sm text-snow text-right font-medium">
-              {{ participant.score ?? '--' }}
+              {{ participant.score ?? "--" }}
             </td>
           </tr>
         </tbody>

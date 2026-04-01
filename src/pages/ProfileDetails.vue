@@ -56,7 +56,9 @@ const redirectToLogin = async () => {
 const fetchEloHistory = async () => {
   eloLoading.value = true;
   try {
-    eloHistory.value = await apiService.getHistoricalEloByUserId(profileId.value);
+    eloHistory.value = await apiService.getHistoricalEloByUserId(
+      profileId.value,
+    );
   } catch (err) {
     console.error("Failed to fetch ELO history:", err);
   } finally {
@@ -151,7 +153,10 @@ onMounted(() => {
           <div class="h-14 rounded-lg bg-asphalt-light"></div>
           <div class="h-14 rounded-lg bg-asphalt-light"></div>
         </div>
-        <div class="mt-5 rounded-lg bg-asphalt-light animate-pulse" style="height: 320px;"></div>
+        <div
+          class="mt-5 rounded-lg bg-asphalt-light animate-pulse"
+          style="height: 320px"
+        ></div>
       </div>
 
       <EmptyState
@@ -215,9 +220,11 @@ onMounted(() => {
                 </span>
                 <span
                   v-if="player.role"
-                  :class="player.role === 'admin'
-                    ? 'rounded-full bg-ball/20 px-3 py-1 text-xs font-medium capitalize text-ball'
-                    : 'rounded-full bg-asphalt px-3 py-1 text-xs font-medium capitalize text-snow-dim'"
+                  :class="
+                    player.role === 'admin'
+                      ? 'rounded-full bg-ball/20 px-3 py-1 text-xs font-medium capitalize text-ball'
+                      : 'rounded-full bg-asphalt px-3 py-1 text-xs font-medium capitalize text-snow-dim'
+                  "
                 >
                   {{ player.role }}
                 </span>
@@ -250,9 +257,16 @@ onMounted(() => {
         <!-- ELO history chart -->
         <div class="mt-5">
           <!-- Loading shimmer -->
-          <div v-if="eloLoading" class="rounded-lg bg-asphalt animate-pulse h-[calc(theme(spacing.64)+theme(spacing.16))]"></div>
+          <div
+            v-if="eloLoading"
+            class="rounded-lg bg-asphalt animate-pulse h-[calc(theme(spacing.64)+theme(spacing.16))]"
+          ></div>
           <!-- Chart -->
-          <EloChart v-else-if="eloHistory" :eloData="eloHistory" :nested="true" />
+          <EloChart
+            v-else-if="eloHistory"
+            :eloData="eloHistory"
+            :nested="true"
+          />
         </div>
 
         <!-- Admin-only account section -->

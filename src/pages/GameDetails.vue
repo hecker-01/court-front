@@ -56,8 +56,7 @@ const currentUserId = computed(() => {
 
 const hasSchedule = computed(() => {
   return (
-    authService.isAuthenticated() &&
-    game.value?.schedule?.rounds?.length > 0
+    authService.isAuthenticated() && game.value?.schedule?.rounds?.length > 0
   );
 });
 
@@ -130,8 +129,8 @@ const handleLeave = async () => {
 };
 
 const navigateToProfile = (userId) => {
-  router.push(`/profile/${userId}`)
-}
+  router.push(`/profile/${userId}`);
+};
 
 onMounted(() => {
   fetchGame();
@@ -259,7 +258,10 @@ onMounted(() => {
         </div>
 
         <!-- Participants Section -->
-        <div v-if="game.participants" class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
+        <div
+          v-if="game.participants"
+          class="bg-charcoal shadow rounded-lg p-6 sm:p-8"
+        >
           <h2 class="text-xl font-bold text-snow mb-4">
             Participants ({{ game.participants?.length ?? 0 }})
           </h2>
@@ -276,7 +278,10 @@ onMounted(() => {
         </div>
 
         <!-- Schedule Section -->
-        <div v-if="hasSchedule" class="bg-charcoal shadow rounded-lg p-6 sm:p-8">
+        <div
+          v-if="hasSchedule"
+          class="bg-charcoal shadow rounded-lg p-6 sm:p-8"
+        >
           <h2 class="text-xl font-bold text-snow mb-4">
             <font-awesome-icon icon="clipboard-list" class="mr-2 text-racket" />
             Schedule

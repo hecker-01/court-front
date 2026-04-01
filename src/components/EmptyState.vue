@@ -12,7 +12,10 @@ defineEmits(["action"]);
 
 <template>
   <div class="bg-charcoal rounded-lg p-8 text-center">
-    <font-awesome-icon :icon="icon" class="mx-auto h-8 w-8 text-asphalt-muted" />
+    <font-awesome-icon
+      :icon="icon"
+      class="mx-auto h-8 w-8 text-asphalt-muted"
+    />
     <h3 class="mt-2 text-sm font-medium text-snow">{{ title }}</h3>
     <p v-if="message" class="mt-1 text-sm text-asphalt-muted">{{ message }}</p>
     <div v-if="actionLabel" class="mt-6">

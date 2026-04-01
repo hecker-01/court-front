@@ -23,7 +23,9 @@ const mySchedule = computed(() => {
   <div class="space-y-6">
     <!-- Your Schedule (personal view for authenticated user) -->
     <div v-if="mySchedule" class="bg-asphalt rounded-lg p-4">
-      <h3 class="text-sm font-semibold text-racket uppercase tracking-wide mb-3">
+      <h3
+        class="text-sm font-semibold text-racket uppercase tracking-wide mb-3"
+      >
         <font-awesome-icon icon="user-circle" class="mr-1.5" />
         Your Schedule
       </h3>
@@ -33,12 +35,16 @@ const mySchedule = computed(() => {
           :key="round.round"
           class="flex items-center gap-3 bg-charcoal rounded-lg px-4 py-3"
         >
-          <span class="text-xs font-semibold text-snow-dim uppercase w-16 shrink-0">
+          <span
+            class="text-xs font-semibold text-snow-dim uppercase w-16 shrink-0"
+          >
             Round {{ round.round }}
           </span>
 
           <template v-if="round.isBye">
-            <span class="text-sm text-asphalt-muted italic">Bye — no match</span>
+            <span class="text-sm text-asphalt-muted italic"
+              >Bye — no match</span
+            >
           </template>
           <template v-else>
             <span class="text-sm text-snow-dim">Field {{ round.field }}</span>
@@ -58,7 +64,9 @@ const mySchedule = computed(() => {
 
     <!-- Full Round-by-Round Schedule -->
     <div v-if="rounds.length">
-      <h3 class="text-sm font-semibold text-snow-dim uppercase tracking-wide mb-3">
+      <h3
+        class="text-sm font-semibold text-snow-dim uppercase tracking-wide mb-3"
+      >
         <font-awesome-icon icon="clipboard-list" class="mr-1.5" />
         All Rounds
       </h3>
@@ -71,7 +79,9 @@ const mySchedule = computed(() => {
         >
           <!-- Round header -->
           <div class="px-4 py-2 bg-asphalt-light">
-            <span class="text-xs font-semibold text-snow-dim uppercase tracking-wide">
+            <span
+              class="text-xs font-semibold text-snow-dim uppercase tracking-wide"
+            >
               Round {{ round.round }}
             </span>
           </div>
@@ -95,32 +105,55 @@ const mySchedule = computed(() => {
               <button
                 type="button"
                 class="flex items-center gap-2 min-w-0 flex-1 text-left cursor-pointer hover:text-racket transition-colors"
-                :class="match.playerA.userId === currentUserId ? 'text-racket font-semibold' : 'text-snow'"
+                :class="
+                  match.playerA.userId === currentUserId
+                    ? 'text-racket font-semibold'
+                    : 'text-snow'
+                "
                 @click="emit('player-click', match.playerA.userId)"
               >
                 <span
                   class="w-6 h-6 rounded-full bg-asphalt-light flex items-center justify-center text-xs font-semibold uppercase shrink-0"
-                  :class="match.playerA.userId === currentUserId ? 'text-racket' : 'text-snow'"
+                  :class="
+                    match.playerA.userId === currentUserId
+                      ? 'text-racket'
+                      : 'text-snow'
+                  "
                 >
                   {{ match.playerA.username?.charAt(0) || "?" }}
                 </span>
-                <span class="text-sm truncate">{{ match.playerA.username }}</span>
+                <span class="text-sm truncate">{{
+                  match.playerA.username
+                }}</span>
               </button>
 
               <!-- VS -->
-              <span class="text-xs font-bold text-asphalt-muted uppercase shrink-0">vs</span>
+              <span
+                class="text-xs font-bold text-asphalt-muted uppercase shrink-0"
+                >vs</span
+              >
 
               <!-- Player B -->
               <button
                 type="button"
                 class="flex items-center gap-2 min-w-0 flex-1 text-right justify-end cursor-pointer hover:text-racket transition-colors"
-                :class="match.playerB.userId === currentUserId ? 'text-racket font-semibold' : 'text-snow'"
+                :class="
+                  match.playerB.userId === currentUserId
+                    ? 'text-racket font-semibold'
+                    : 'text-snow'
+                "
                 @click="emit('player-click', match.playerB.userId)"
               >
-                <span class="text-sm truncate">{{ match.playerB.username }}</span>
+                <span class="text-sm truncate">{{
+                  match.playerB.username
+                }}</span>
                 <span
                   class="w-6 h-6 rounded-full bg-asphalt-light flex items-center justify-center text-xs font-semibold uppercase shrink-0"
-                  :class="match.playerB.userId === currentUserId ? 'text-racket' : 'text-snow'"
+                  :class="
+                    match.playerB.userId === currentUserId
+                      ? 'text-racket'
+                      : 'text-snow'
+                  "
                 >
                   {{ match.playerB.username?.charAt(0) || "?" }}
                 </span>
@@ -130,15 +163,39 @@ const mySchedule = computed(() => {
 
           <!-- Byes -->
           <div
-            v-if="round.byes?.length"
-            class="px-4 py-2 border-t border-asphalt-light"
+            v-for="bye in round.byes"
+            :key="bye.userId"
+            class="flex items-center gap-3 px-4 py-3 border-t border-asphalt-light"
           >
-            <span class="text-xs text-asphalt-muted">
-              Bye:
-              <span v-for="(bye, i) in round.byes" :key="i">
-                {{ bye.username }}<template v-if="i < round.byes.length - 1">, </template>
-              </span>
+            <span
+              class="shrink-0 w-7 h-7 rounded bg-asphalt-light flex items-center justify-center text-xs font-semibold text-snow-dim"
+              title="No field assigned"
+            >
+              —
             </span>
+            <button
+              type="button"
+              class="flex items-center gap-2 min-w-0 flex-1 text-left cursor-pointer hover:text-racket transition-colors"
+              :class="
+                bye.userId === currentUserId
+                  ? 'text-racket font-semibold'
+                  : 'text-snow'
+              "
+              @click="emit('player-click', bye.userId)"
+            >
+              <span
+                class="w-6 h-6 rounded-full bg-asphalt-light flex items-center justify-center text-xs font-semibold uppercase shrink-0"
+                :class="
+                  bye.userId === currentUserId ? 'text-racket' : 'text-snow'
+                "
+              >
+                {{ bye.username?.charAt(0) || "?" }}
+              </span>
+              <span class="text-sm truncate">{{ bye.username }}</span>
+            </button>
+            <span class="text-xs text-asphalt-muted italic shrink-0"
+              >Sitting out</span
+            >
           </div>
         </div>
       </div>

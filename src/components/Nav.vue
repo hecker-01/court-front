@@ -44,7 +44,9 @@ const navItems = [
           :class="{ 'text-white': item.names.includes(route.name) }"
         >
           <font-awesome-icon :icon="item.icon" class="text-xl sm:text-2xl" />
-          <span class="truncate text-[11px] leading-none sm:text-xs">{{ item.label }}</span>
+          <span class="truncate text-[11px] leading-none sm:text-xs">{{
+            item.label
+          }}</span>
         </router-link>
       </li>
     </ul>

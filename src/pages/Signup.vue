@@ -146,7 +146,12 @@ const handleSignup = async () => {
           />
         </div>
 
-        <ErrorMessage v-if="error" title="Signup failed" :message="error" :hint="error" />
+        <ErrorMessage
+          v-if="error"
+          title="Signup failed"
+          :message="error"
+          :hint="error"
+        />
 
         <div>
           <button

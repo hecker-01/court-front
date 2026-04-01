@@ -150,11 +150,20 @@ onMounted(() => {
 
       <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
         <section class="space-y-3">
-          <div v-if="isLoading" class="bg-charcoal rounded-lg divide-y divide-asphalt-light animate-pulse">
-            <div v-for="n in 8" :key="n" class="flex items-center justify-between gap-3 px-4 py-3">
+          <div
+            v-if="isLoading"
+            class="bg-charcoal rounded-lg divide-y divide-asphalt-light animate-pulse"
+          >
+            <div
+              v-for="n in 8"
+              :key="n"
+              class="flex items-center justify-between gap-3 px-4 py-3"
+            >
               <div class="flex items-center gap-3">
                 <div class="w-6 h-4 rounded bg-asphalt-light shrink-0"></div>
-                <div class="w-8 h-8 rounded-full bg-asphalt-light shrink-0"></div>
+                <div
+                  class="w-8 h-8 rounded-full bg-asphalt-light shrink-0"
+                ></div>
                 <div class="h-4 w-32 rounded bg-asphalt-light"></div>
               </div>
               <div class="h-4 w-20 rounded bg-asphalt-light"></div>
@@ -180,7 +189,10 @@ onMounted(() => {
             @action="fetchLeaderboard"
           />
 
-          <div v-else class="bg-charcoal rounded-lg divide-y divide-asphalt-light">
+          <div
+            v-else
+            class="bg-charcoal rounded-lg divide-y divide-asphalt-light"
+          >
             <button
               v-for="(player, index) in leaderboardPlayers"
               :key="player.id"
@@ -192,21 +204,37 @@ onMounted(() => {
                 <span
                   class="w-6 shrink-0 text-right text-sm font-bold"
                   :class="player.rank === 1 ? 'text-ball' : 'text-snow-dim'"
-                >{{ player.rank ?? index + 1 }}</span>
+                  >{{ player.rank ?? index + 1 }}</span
+                >
 
-                <div class="w-8 h-8 rounded-full bg-asphalt-light flex items-center justify-center text-snow text-sm font-semibold uppercase shrink-0">
-                  {{ (player.name || '?').charAt(0) }}
+                <div
+                  class="w-8 h-8 rounded-full bg-asphalt-light flex items-center justify-center text-snow text-sm font-semibold uppercase shrink-0"
+                >
+                  {{ (player.name || "?").charAt(0) }}
                 </div>
 
                 <div class="flex items-center gap-2 min-w-0">
-                  <span class="truncate text-snow font-medium">{{ player.name || 'Unknown' }}</span>
-                  <font-awesome-icon v-if="player.rank === 1" icon="crown" class="text-ball text-xs shrink-0" />
-                  <font-awesome-icon v-else-if="player.rank === 2 || player.rank === 3" icon="trophy" class="text-racket text-xs shrink-0" />
+                  <span class="truncate text-snow font-medium">{{
+                    player.name || "Unknown"
+                  }}</span>
+                  <font-awesome-icon
+                    v-if="player.rank === 1"
+                    icon="crown"
+                    class="text-ball text-xs shrink-0"
+                  />
+                  <font-awesome-icon
+                    v-else-if="player.rank === 2 || player.rank === 3"
+                    icon="trophy"
+                    class="text-racket text-xs shrink-0"
+                  />
                 </div>
               </div>
 
               <span class="text-snow-dim text-sm font-mono shrink-0">
-                <font-awesome-icon icon="chart-line" class="mr-1" />{{ player.elo ?? 1000 }} ELO
+                <font-awesome-icon icon="chart-line" class="mr-1" />{{
+                  player.elo ?? 1000
+                }}
+                ELO
               </span>
             </button>
           </div>
