@@ -61,14 +61,25 @@ const handleLogin = async () => {
   <div
     class="min-h-[calc(100dvh-var(--nav-h))] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
   >
-    <div class="max-w-md w-full space-y-8">
-      <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-snow">
-          Sign in to your account
+    <div class="max-w-md w-full">
+      <div class="mb-8 text-center">
+        <div
+          class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-grad shadow-glow"
+        >
+          <font-awesome-icon icon="trophy" class="text-2xl text-white" />
+        </div>
+        <h2 class="text-3xl font-extrabold tracking-tight text-snow">
+          Welcome back
         </h2>
+        <p class="mt-2 text-sm text-snow-dim">
+          Sign in to track your games and ranking.
+        </p>
       </div>
 
-      <form class="mt-4 space-y-6" @submit.prevent="handleLogin">
+      <form
+        class="glass-card space-y-6 p-7"
+        @submit.prevent="handleLogin"
+      >
         <div class="space-y-4">
           <FormInput
             id="email"
@@ -101,7 +112,7 @@ const handleLogin = async () => {
           <button
             type="submit"
             :disabled="isLoading"
-            class="group relative w-full flex items-center justify-center gap-2 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-racket hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket disabled:opacity-50 disabled:cursor-not-allowed"
+            class="btn-violet w-full py-3"
           >
             <LoadingSpinner v-if="isLoading" class="text-white" />
             <font-awesome-icon v-else icon="sign-in-alt" />
@@ -112,7 +123,7 @@ const handleLogin = async () => {
             Or
             <router-link
               to="/signup"
-              class="font-medium text-racket hover:text-racket-hover"
+              class="font-semibold text-racket hover:text-racket-hover"
             >
               create a new account
             </router-link>

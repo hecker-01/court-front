@@ -11,7 +11,9 @@ const emit = defineEmits(["retry"]);
 </script>
 
 <template>
-  <div class="bg-danger-surface border border-danger-border rounded-lg p-6">
+  <div
+    class="rounded-2xl border border-danger-border/60 bg-danger-surface/70 p-6 shadow-card backdrop-blur-xl"
+  >
     <div class="flex">
       <div class="flex-shrink-0">
         <font-awesome-icon icon="circle-xmark" class="h-5 w-5 text-danger" />
