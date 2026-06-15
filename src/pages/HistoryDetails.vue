@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { t } from "@/i18n";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
@@ -36,14 +37,14 @@ const fetchGameDetails = async () => {
         router.push({ name: "Login", query: { redirect: route.fullPath } });
         return;
       } else {
-        error.value = "Game not found";
+        error.value = t("historyDetails.gameNotFound");
       }
     } else if (err.status === 404) {
-      error.value = "Game not found";
+      error.value = t("historyDetails.gameNotFound");
     } else if (err.status === 500) {
-      error.value = "Something went wrong. Please try again later.";
+      error.value = t("common.serverError");
     } else {
-      error.value = err.message || "Failed to load game details";
+      error.value = err.message || t("historyDetails.loadError");
     }
   } finally {
     isLoading.value = false;
@@ -68,7 +69,7 @@ onMounted(() => {
         class="mb-6 inline-flex items-center text-sm font-medium text-snow-dim hover:text-snow"
       >
         <font-awesome-icon icon="arrow-left" class="mr-2" />
-        Back to Game History
+        {{ $t("historyDetails.back") }}
       </button>
 
       <!-- Loading State -->
@@ -81,25 +82,25 @@ onMounted(() => {
       <!-- Error State -->
       <ErrorMessage
         v-else-if="error"
-        title="Error loading game"
+        :title="$t('historyDetails.errorTitle')"
         :message="error"
-        hint="We couldn't load this game. Try again or go back to your game history."
+        :hint="$t('historyDetails.errorHint')"
       >
         <template #actions>
           <button
-            v-if="error !== 'Game not found'"
+            v-if="error !== $t('historyDetails.gameNotFound')"
             @click="fetchGameDetails"
             class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
           >
             <font-awesome-icon icon="redo" class="mr-1" />
-            Try again
+            {{ $t("common.tryAgain") }}
           </button>
           <button
             @click="router.push('/history')"
             class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
           >
             <font-awesome-icon icon="arrow-left" class="mr-1" />
-            Back to history
+            {{ $t("historyDetails.backToHistory") }}
           </button>
         </template>
       </ErrorMessage>
@@ -116,7 +117,7 @@ onMounted(() => {
               class="px-3 py-1 text-sm font-semibold rounded-lg capitalize"
               :class="getStatusClasses(game.status)"
             >
-              {{ game.status === "processed" ? "Ended" : game.status }}
+              {{ game.status === "processed" ? $t("historyDetails.ended") : game.status }}
             </span>
           </div>
 
@@ -131,13 +132,13 @@ onMounted(() => {
 
         <!-- Scoreboard -->
         <div class="bg-charcoal rounded-lg p-6">
-          <h2 class="text-xl font-bold text-snow mb-4">Scoreboard</h2>
+          <h2 class="text-xl font-bold text-snow mb-4">{{ $t("historyDetails.scoreboard") }}</h2>
           <PlayerList
             :participants="game.participants || []"
             :winner-user-id="game.winnerUserId"
             value-field="score"
-            value-label="pts"
-            empty-text="No participants recorded."
+            :value-label="$t('historyDetails.points')"
+            :empty-text="$t('historyDetails.noParticipants')"
             :clickable="true"
             @player-click="navigateToProfile"
           />

@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from "vue";
+import { t } from "@/i18n";
 import { formatDate } from "@/utils/formatters.js";
 
 const props = defineProps({
@@ -14,24 +15,24 @@ const gridClass = computed(
 const items = computed(() => {
   const list = [
     {
-      label: "Planned At",
-      value: formatDate(props.game.plannedAt) || "Unknown",
+      label: t("game.plannedAt"),
+      value: formatDate(props.game.plannedAt) || t("game.unknown"),
       show: props.game.status === "planned",
     },
     {
-      label: "Started At",
-      value: formatDate(props.game.startedAt) || "Unknown",
+      label: t("game.startedAt"),
+      value: formatDate(props.game.startedAt) || t("game.unknown"),
       show: props.game.status !== "planned",
     },
     {
-      label: "Ended At",
-      value: formatDate(props.game.endedAt) || "Unknown",
+      label: t("game.endedAt"),
+      value: formatDate(props.game.endedAt) || t("game.unknown"),
       show: !!props.game.endedAt,
     },
   ];
   if (props.columns >= 3) {
     list.push({
-      label: "Players",
+      label: t("game.players"),
       value: props.game.participants?.length ?? 0,
     });
   }

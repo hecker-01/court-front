@@ -20,22 +20,22 @@ const sortedParticipants = computed(() => {
 
 <template>
   <div class="bg-charcoal rounded-lg p-6">
-    <h2 class="text-lg font-semibold text-snow mb-4">Scoreboard</h2>
+    <h2 class="text-lg font-semibold text-snow mb-4">{{ $t("scoreboard.title") }}</h2>
 
     <div
       v-if="sortedParticipants.length === 0"
       class="text-sm text-asphalt-muted text-center py-4"
     >
-      No participants recorded.
+      {{ $t("scoreboard.noParticipants") }}
     </div>
 
     <div v-else class="overflow-x-auto">
       <table class="w-full text-left">
         <thead>
           <tr class="border-b border-asphalt-light">
-            <th class="pb-3 text-xs text-asphalt-muted w-16">#</th>
-            <th class="pb-3 text-xs text-asphalt-muted">Player</th>
-            <th class="pb-3 text-xs text-asphalt-muted text-right">Score</th>
+            <th class="pb-3 text-xs text-asphalt-muted w-16">{{ $t("scoreboard.rank") }}</th>
+            <th class="pb-3 text-xs text-asphalt-muted">{{ $t("scoreboard.player") }}</th>
+            <th class="pb-3 text-xs text-asphalt-muted text-right">{{ $t("scoreboard.score") }}</th>
           </tr>
         </thead>
         <tbody>

@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import Nav from "./components/Nav.vue";
+import LanguageSwitcher from "./components/LanguageSwitcher.vue";
 
 const router = useRouter();
+const route = useRoute();
 const isInitialLoad = ref(true);
 
 router.isReady().then(() => {
@@ -15,6 +17,12 @@ router.isReady().then(() => {
 
 <template>
   <div class="min-h-screen pb-20 md:pb-28">
+    <div
+      v-if="route.name !== 'NotFound'"
+      class="fixed right-4 top-4 z-50"
+    >
+      <LanguageSwitcher />
+    </div>
     <router-view v-slot="{ Component, route }">
       <Transition :name="isInitialLoad ? '' : 'page'" mode="out-in">
         <component :is="Component" :key="route.path" />

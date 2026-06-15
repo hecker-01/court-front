@@ -10,17 +10,17 @@ const emit = defineEmits(["navigate"]);
 
 const statusConfig = {
   started: {
-    label: "Started",
+    labelKey: "game.status.started",
     bg: "bg-status-pending/20",
     text: "text-status-pending",
   },
   ended: {
-    label: "Ended",
+    labelKey: "game.status.ended",
     bg: "bg-status-delivering/20",
     text: "text-status-delivering",
   },
   processed: {
-    label: "Ended",
+    labelKey: "game.status.ended",
     bg: "bg-status-processed/20",
     text: "text-status-processed",
   },
@@ -42,7 +42,7 @@ const status =
           class="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium"
           :class="[status.bg, status.text]"
         >
-          {{ status.label }}
+          {{ $t(status.labelKey) }}
         </span>
       </div>
 
@@ -58,11 +58,11 @@ const status =
       >
         <span class="text-snow-dim">
           <font-awesome-icon icon="calendar-days" class="mr-1" />
-          {{ formatDate(game.startedAt) || "Unknown" }}
+          {{ formatDate(game.startedAt) || $t("game.unknown") }}
         </span>
         <span class="text-snow-dim text-center">
           <template v-if="game.userScore != null">
-            Your score: {{ game.userScore }}
+            {{ $t("game.yourScore", { score: game.userScore }) }}
           </template>
           <template v-else>--</template>
         </span>
@@ -75,7 +75,7 @@ const status =
                   : 'text-danger'
               "
             >
-              {{ game.winnerUserId === currentUserId ? "Win" : "Loss" }}
+              {{ game.winnerUserId === currentUserId ? $t("game.win") : $t("game.loss") }}
             </span>
           </template>
           <template v-else>--</template>

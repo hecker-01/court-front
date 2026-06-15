@@ -6,25 +6,25 @@ const route = useRoute();
 const navItems = [
   {
     to: "/",
-    label: "Home",
+    label: "nav.home",
     icon: "house",
     names: ["Home"],
   },
   {
     to: "/leaderboard",
-    label: "Leaderboard",
+    label: "nav.leaderboard",
     icon: "trophy",
     names: ["Leaderboard", "ProfileDetails"],
   },
   {
     to: "/history",
-    label: "History",
+    label: "nav.history",
     icon: "chart-line",
     names: ["History"],
   },
   {
     to: "/account",
-    label: "Account",
+    label: "nav.account",
     icon: "user-circle",
     names: ["Account"],
   },
@@ -60,7 +60,7 @@ const navItems = [
             <font-awesome-icon :icon="item.icon" class="text-base sm:text-lg" />
           </span>
           <span class="truncate text-[10px] font-medium leading-none sm:text-xs">{{
-            item.label
+            $t(item.label)
           }}</span>
         </router-link>
       </li>

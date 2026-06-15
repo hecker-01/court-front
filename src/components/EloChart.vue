@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { t, currentLocale } from "@/i18n";
 import {
   Chart,
   LineController,
@@ -34,7 +35,10 @@ const hasHistory = () =>
 
 const formatDate = (dateStr) => {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return d.toLocaleDateString(currentLocale.value, {
+    month: "short",
+    day: "numeric",
+  });
 };
 
 const createChart = () => {
@@ -94,7 +98,7 @@ const createChart = () => {
               const idx = items[0].dataIndex;
               return gameNames[idx] || labels[idx];
             },
-            label: (item) => `ELO: ${item.raw}`,
+            label: (item) => t("eloChart.tooltipElo", { value: item.raw }),
           },
         },
         legend: { display: false },
@@ -147,7 +151,7 @@ watch(
     <div v-if="!nested" class="mb-5 flex items-center justify-between gap-3">
       <div>
         <p class="text-xs font-semibold uppercase tracking-wide text-snow-dim">
-          Current ELO
+          {{ $t("eloChart.currentElo") }}
         </p>
         <p
           class="mt-1 bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-3xl font-extrabold text-transparent"
@@ -168,7 +172,7 @@ watch(
       v-else
       class="flex items-center justify-center h-64 text-asphalt-muted"
     >
-      No ELO history yet
+      {{ $t("eloChart.noHistory") }}
     </div>
   </div>
 </template>

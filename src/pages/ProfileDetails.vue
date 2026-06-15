@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { t } from "@/i18n";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
 import EmptyState from "@/components/EmptyState.vue";
@@ -24,7 +25,7 @@ const isOwnProfile = computed(
   () => Number(profileId.value) === Number(currentUser.value?.id),
 );
 const displayName = computed(
-  () => player.value?.name || player.value?.username || "Unknown player",
+  () => player.value?.name || player.value?.username || t("profile.unknownPlayer"),
 );
 const memberSince = computed(() =>
   player.value?.createdAt
@@ -33,7 +34,7 @@ const memberSince = computed(() =>
         month: "long",
         day: "numeric",
       })
-    : "N/A",
+    : t("common.na"),
 );
 const profileInitial = computed(
   () => displayName.value.charAt(0).toUpperCase() || "?",
@@ -96,11 +97,11 @@ const fetchProfile = async () => {
     }
 
     if (err.status === 404) {
-      error.value = "Player not found";
+      error.value = t("profile.playerNotFound");
     } else if (err.status === 500) {
-      error.value = "Something went wrong. Please try again later.";
+      error.value = t("common.serverError");
     } else {
-      error.value = err.message || "Failed to load player profile";
+      error.value = err.message || t("profile.loadError");
     }
   } finally {
     isLoading.value = false;
@@ -129,7 +130,7 @@ onMounted(() => {
         @click="goBack"
       >
         <font-awesome-icon icon="arrow-left" class="mr-2" />
-        Back
+        {{ $t("profile.back") }}
       </button>
 
       <!-- Loading skeleton -->
@@ -162,9 +163,9 @@ onMounted(() => {
       <EmptyState
         v-else-if="requiresLogin"
         icon="user-circle"
-        title="Sign in to view profiles."
-        message="Profiles are only available when you're logged in."
-        action-label="Sign in"
+        :title="$t('profile.signInTitle')"
+        :message="$t('profile.signInMessage')"
+        :action-label="$t('profile.signIn')"
         action-icon="sign-in-alt"
         @action="
           router.push({ name: 'Login', query: { redirect: route.fullPath } })
@@ -173,19 +174,19 @@ onMounted(() => {
 
       <ErrorMessage
         v-else-if="error"
-        title="Couldn't load profile"
+        :title="$t('profile.errorTitle')"
         :message="error"
-        hint="Try again in a moment, or head back."
+        :hint="$t('profile.errorHint')"
       >
         <template #actions>
           <button
-            v-if="error !== 'Player not found'"
+            v-if="error !== $t('profile.playerNotFound')"
             type="button"
             class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
             @click="fetchProfile"
           >
             <font-awesome-icon icon="redo" class="mr-1" />
-            Try again
+            {{ $t("common.tryAgain") }}
           </button>
           <button
             type="button"
@@ -193,7 +194,7 @@ onMounted(() => {
             @click="goBack"
           >
             <font-awesome-icon icon="arrow-left" class="mr-1" />
-            Back
+            {{ $t("profile.back") }}
           </button>
         </template>
       </ErrorMessage>
@@ -216,7 +217,7 @@ onMounted(() => {
                   v-if="isOwnProfile"
                   class="rounded-full bg-racket/20 px-3 py-1 text-xs font-medium text-racket"
                 >
-                  You
+                  {{ $t("profile.you") }}
                 </span>
                 <span
                   v-if="player.role"
@@ -235,7 +236,7 @@ onMounted(() => {
           <div class="rounded-lg bg-asphalt px-4 py-3 text-center">
             <p class="text-3xl font-bold text-snow">{{ player.elo ?? 1000 }}</p>
             <p class="mt-1 text-xs uppercase tracking-wide text-snow-dim">
-              Rating
+              {{ $t("profile.rating") }}
             </p>
           </div>
         </div>
@@ -244,12 +245,12 @@ onMounted(() => {
         <div class="grid grid-cols-2 gap-3 pt-5">
           <div class="rounded-lg bg-asphalt px-4 py-3">
             <p class="text-xs uppercase tracking-wide text-snow-dim">
-              Member ID
+              {{ $t("profile.memberId") }}
             </p>
             <p class="mt-1 text-sm font-medium text-snow">{{ player.id }}</p>
           </div>
           <div class="rounded-lg bg-asphalt px-4 py-3">
-            <p class="text-xs uppercase tracking-wide text-snow-dim">Joined</p>
+            <p class="text-xs uppercase tracking-wide text-snow-dim">{{ $t("profile.joined") }}</p>
             <p class="mt-1 text-sm font-medium text-snow">{{ memberSince }}</p>
           </div>
         </div>
@@ -274,17 +275,17 @@ onMounted(() => {
           v-if="player.email || player.role"
           class="mt-5 rounded-lg border border-asphalt-light bg-asphalt p-4"
         >
-          <h3 class="text-sm font-semibold text-snow">Account</h3>
+          <h3 class="text-sm font-semibold text-snow">{{ $t("profile.account") }}</h3>
           <div class="mt-4 grid gap-4 sm:grid-cols-2">
             <div v-if="player.email">
               <p class="text-xs uppercase tracking-wide text-asphalt-muted">
-                Email
+                {{ $t("profile.email") }}
               </p>
               <p class="mt-2 break-all text-sm text-snow">{{ player.email }}</p>
             </div>
             <div v-if="player.role">
               <p class="text-xs uppercase tracking-wide text-asphalt-muted">
-                Role
+                {{ $t("profile.role") }}
               </p>
               <p class="mt-2 text-sm capitalize text-snow">{{ player.role }}</p>
             </div>

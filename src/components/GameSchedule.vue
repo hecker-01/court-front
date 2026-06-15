@@ -27,7 +27,7 @@ const mySchedule = computed(() => {
         class="text-sm font-semibold text-racket uppercase tracking-wide mb-3"
       >
         <font-awesome-icon icon="user-circle" class="mr-1.5" />
-        Your Schedule
+        {{ $t("schedule.yourSchedule") }}
       </h3>
       <div class="grid gap-2">
         <div
@@ -38,18 +38,18 @@ const mySchedule = computed(() => {
           <span
             class="text-xs font-semibold text-snow-dim uppercase w-16 shrink-0"
           >
-            Round {{ round.round }}
+            {{ $t("schedule.round", { n: round.round }) }}
           </span>
 
           <template v-if="round.isSittingOut">
             <span class="text-sm text-asphalt-muted italic"
-              >Sitting out - no match</span
+              >{{ $t("schedule.sittingOutNoMatch") }}</span
             >
           </template>
           <template v-else>
-            <span class="text-sm text-snow-dim">Field {{ round.field }}</span>
+            <span class="text-sm text-snow-dim">{{ $t("schedule.field", { n: round.field }) }}</span>
             <span class="text-snow-dim mx-1">·</span>
-            <span class="text-sm text-snow">vs</span>
+            <span class="text-sm text-snow">{{ $t("schedule.vs") }}</span>
             <button
               type="button"
               class="text-sm font-medium text-snow hover:text-racket transition-colors cursor-pointer"
@@ -68,7 +68,7 @@ const mySchedule = computed(() => {
         class="text-sm font-semibold text-snow-dim uppercase tracking-wide mb-3"
       >
         <font-awesome-icon icon="clipboard-list" class="mr-1.5" />
-        All Rounds
+        {{ $t("schedule.allRounds") }}
       </h3>
 
       <div class="space-y-4">
@@ -82,7 +82,7 @@ const mySchedule = computed(() => {
             <span
               class="text-xs font-semibold text-snow-dim uppercase tracking-wide"
             >
-              Round {{ round.round }}
+              {{ $t("schedule.round", { n: round.round }) }}
             </span>
           </div>
 
@@ -96,7 +96,7 @@ const mySchedule = computed(() => {
               <!-- Field badge -->
               <span
                 class="shrink-0 w-7 h-7 rounded bg-asphalt-light flex items-center justify-center text-xs font-semibold text-snow-dim"
-                title="Field number"
+                :title="$t('schedule.fieldNumber')"
               >
                 {{ match.field }}
               </span>
@@ -130,7 +130,7 @@ const mySchedule = computed(() => {
               <!-- VS -->
               <span
                 class="text-xs font-bold text-asphalt-muted uppercase shrink-0"
-                >vs</span
+                >{{ $t("schedule.vs") }}</span
               >
 
               <!-- Player B -->
@@ -169,7 +169,7 @@ const mySchedule = computed(() => {
           >
             <span
               class="shrink-0 w-7 h-7 rounded bg-asphalt-light flex items-center justify-center text-xs font-semibold text-snow-dim"
-              title="No field assigned"
+              :title="$t('schedule.noField')"
             >
               -
             </span>
@@ -194,7 +194,7 @@ const mySchedule = computed(() => {
               <span class="text-sm truncate">{{ bye.username }}</span>
             </button>
             <span class="text-xs text-asphalt-muted italic shrink-0"
-              >Sitting out</span
+              >{{ $t("schedule.sittingOut") }}</span
             >
           </div>
         </div>
@@ -206,7 +206,7 @@ const mySchedule = computed(() => {
       v-if="!rounds.length"
       class="text-sm text-asphalt-muted text-center py-4"
     >
-      No schedule generated yet.
+      {{ $t("schedule.empty") }}
     </p>
   </div>
 </template>

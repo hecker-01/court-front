@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { t } from "@/i18n";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
 import { formatDate } from "@/utils/formatters.js";
@@ -21,19 +22,19 @@ const isSigningUp = ref(false);
 const gameId = route.params.id;
 
 const statusConfig = {
-  planned: { label: "Planned", bg: "bg-racket/20", text: "text-racket" },
+  planned: { labelKey: "game.status.planned", bg: "bg-racket/20", text: "text-racket" },
   started: {
-    label: "Started",
+    labelKey: "game.status.started",
     bg: "bg-status-pending/20",
     text: "text-status-pending",
   },
   ended: {
-    label: "Ended",
+    labelKey: "game.status.ended",
     bg: "bg-status-delivering/20",
     text: "text-status-delivering",
   },
   processed: {
-    label: "Ended",
+    labelKey: "game.status.ended",
     bg: "bg-status-processed/20",
     text: "text-status-processed",
   },
@@ -73,7 +74,7 @@ const fetchGame = async () => {
       const games = await apiService.getGames();
       const found = games.find((g) => String(g.id) === String(gameId));
       if (!found) {
-        error.value = "Game not found. It may have been removed.";
+        error.value = t("gameDetails.notFound");
         return;
       }
       game.value = found;
@@ -85,9 +86,9 @@ const fetchGame = async () => {
       return;
     }
     if (err.status === 404) {
-      error.value = "Game not found. It may have been removed.";
+      error.value = t("gameDetails.notFound");
     } else {
-      error.value = err.message || "Failed to load game details";
+      error.value = err.message || t("gameDetails.loadError");
     }
   } finally {
     isLoading.value = false;
@@ -105,7 +106,7 @@ const handleSignup = async () => {
       router.push({ name: "Login", query: { redirect: route.fullPath } });
       return;
     }
-    error.value = err.message || "Failed to sign up for game";
+    error.value = err.message || t("gameDetails.signupError");
   } finally {
     isSigningUp.value = false;
   }
@@ -122,7 +123,7 @@ const handleLeave = async () => {
       router.push({ name: "Login", query: { redirect: route.fullPath } });
       return;
     }
-    error.value = err.message || "Failed to leave game";
+    error.value = err.message || t("gameDetails.leaveError");
   } finally {
     isSigningUp.value = false;
   }
@@ -146,7 +147,7 @@ onMounted(() => {
         class="mb-6 inline-flex items-center text-sm font-medium text-snow-dim hover:text-snow"
       >
         <font-awesome-icon icon="arrow-left" class="mr-2" />
-        Back to Games
+        {{ $t("gameDetails.back") }}
       </button>
 
       <!-- Loading Skeleton -->
@@ -175,25 +176,25 @@ onMounted(() => {
       <!-- Error State -->
       <ErrorMessage
         v-else-if="error"
-        title="Error loading game"
+        :title="$t('gameDetails.errorTitle')"
         :message="error"
-        hint="We couldn't load this game. It may no longer be available."
+        :hint="$t('gameDetails.errorHint')"
       >
         <template #actions>
           <button
-            v-if="error !== 'Game not found'"
+            v-if="error !== $t('gameDetails.notFound')"
             @click="fetchGame"
             class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
           >
             <font-awesome-icon icon="redo" class="mr-1" />
-            Try again
+            {{ $t("common.tryAgain") }}
           </button>
           <button
             @click="router.push('/')"
             class="text-sm font-medium text-danger hover:text-danger-hover inline-flex items-center"
           >
             <font-awesome-icon icon="arrow-left" class="mr-1" />
-            Back to home
+            {{ $t("gameDetails.backToHome") }}
           </button>
         </template>
       </ErrorMessage>
@@ -210,7 +211,7 @@ onMounted(() => {
               class="self-start shrink-0 px-3 py-1 rounded-full text-sm font-medium"
               :class="[statusDisplay.bg, statusDisplay.text]"
             >
-              {{ statusDisplay.label }}
+              {{ $t(statusDisplay.labelKey) }}
             </span>
           </div>
 
@@ -233,7 +234,7 @@ onMounted(() => {
                   @click="handleSignup"
                 >
                   <FontAwesomeIcon icon="sign-in-alt" class="mr-1" />
-                  {{ isSigningUp ? "Signing up…" : "Sign Up" }}
+                  {{ isSigningUp ? $t("gameDetails.signingUp") : $t("gameDetails.signUp") }}
                 </button>
                 <button
                   v-else
@@ -242,7 +243,7 @@ onMounted(() => {
                   @click="handleLeave"
                 >
                   <FontAwesomeIcon icon="sign-out-alt" class="mr-1" />
-                  {{ isSigningUp ? "Leaving…" : "Leave Game" }}
+                  {{ isSigningUp ? $t("gameDetails.leaving") : $t("gameDetails.leaveGame") }}
                 </button>
               </template>
             </template>
@@ -252,7 +253,7 @@ onMounted(() => {
               class="inline-block px-6 py-2.5 bg-racket text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover no-underline"
             >
               <FontAwesomeIcon icon="sign-in-alt" class="mr-1" />
-              Sign in to join
+              {{ $t("gameDetails.signInToJoin") }}
             </router-link>
           </div>
         </div>
@@ -263,15 +264,15 @@ onMounted(() => {
           class="bg-charcoal shadow rounded-lg p-6 sm:p-8"
         >
           <h2 class="text-xl font-bold text-snow mb-4">
-            Participants ({{ game.participants?.length ?? 0 }})
+            {{ $t("gameDetails.participants", { count: game.participants?.length ?? 0 }) }}
           </h2>
 
           <PlayerList
             :participants="game.participants || []"
             :winner-user-id="game.winnerUserId"
             value-field="elo"
-            value-label="ELO"
-            empty-text="No players have signed up yet."
+            :value-label="$t('common.elo')"
+            :empty-text="$t('gameDetails.noSignups')"
             :clickable="true"
             @player-click="navigateToProfile"
           />
@@ -284,7 +285,7 @@ onMounted(() => {
         >
           <h2 class="text-xl font-bold text-snow mb-4">
             <font-awesome-icon icon="clipboard-list" class="mr-2 text-racket" />
-            Schedule
+            {{ $t("gameDetails.schedule") }}
           </h2>
 
           <GameSchedule

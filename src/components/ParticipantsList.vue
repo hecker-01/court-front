@@ -25,7 +25,7 @@ defineProps({
           v-if="winnerUserId && participant.userId === winnerUserId"
           class="text-xs font-medium text-status-processed bg-status-processed/20 px-2 py-0.5 rounded-full"
         >
-          <font-awesome-icon icon="crown" class="mr-1" /> Winner
+          <font-awesome-icon icon="crown" class="mr-1" /> {{ $t("participants.winner") }}
         </span>
       </div>
       <span
@@ -36,13 +36,13 @@ defineProps({
           <font-awesome-icon icon="chart-line" class="mr-1" />{{
             participant.elo
           }}
-          ELO
+          {{ $t("participants.elo") }}
         </template>
-        <template v-else> {{ participant.score }} pts </template>
+        <template v-else> {{ participant.score }} {{ $t("participants.points") }} </template>
       </span>
     </div>
   </div>
   <p v-else class="text-sm text-asphalt-muted text-center py-4">
-    No players have signed up yet.
+    {{ $t("participants.noSignups") }}
   </p>
 </template>

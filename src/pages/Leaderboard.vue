@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { t } from "@/i18n";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
@@ -73,9 +74,9 @@ const fetchLeaderboard = async () => {
     console.error("Failed to fetch leaderboard:", err);
 
     if (err.status === 500) {
-      leaderboardError.value = "Something went wrong. Please try again later.";
+      leaderboardError.value = t("common.serverError");
     } else {
-      leaderboardError.value = err.message || "Failed to load leaderboard";
+      leaderboardError.value = err.message || t("leaderboard.loadError");
     }
   } finally {
     isLoading.value = false;
@@ -117,9 +118,9 @@ const handleSearch = async () => {
     }
 
     if (err.status === 500) {
-      searchError.value = "Something went wrong. Please try again later.";
+      searchError.value = t("common.serverError");
     } else {
-      searchError.value = err.message || "Failed to search players";
+      searchError.value = err.message || t("leaderboard.searchError");
     }
   } finally {
     isSearching.value = false;
@@ -146,15 +147,15 @@ onMounted(() => {
           class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-snow-dim"
         >
           <font-awesome-icon icon="trophy" class="text-ball" />
-          Season standings
+          {{ $t("leaderboard.badge") }}
         </span>
         <h1
           class="mt-4 bg-gradient-to-r from-snow to-snow-dim bg-clip-text text-4xl font-extrabold tracking-tight text-transparent"
         >
-          Leaderboard
+          {{ $t("leaderboard.title") }}
         </h1>
         <p class="mt-2 text-sm text-snow-dim">
-          Rankings update after each game.
+          {{ $t("leaderboard.subtitle") }}
         </p>
       </div>
 
@@ -182,19 +183,19 @@ onMounted(() => {
 
           <ErrorMessage
             v-else-if="leaderboardError"
-            title="Error loading leaderboard"
+            :title="$t('leaderboard.errorTitle')"
             :message="leaderboardError"
-            hint="Refresh the page or try again in a moment."
-            retry-label="Try again"
+            :hint="$t('leaderboard.errorHint')"
+            :retry-label="$t('common.tryAgain')"
             @retry="fetchLeaderboard"
           />
 
           <EmptyState
             v-else-if="leaderboardPlayers.length === 0"
             icon="users"
-            title="No players ranked yet."
-            message="Rankings appear after games are processed."
-            action-label="Refresh"
+            :title="$t('leaderboard.emptyTitle')"
+            :message="$t('leaderboard.emptyMessage')"
+            :action-label="$t('common.refresh')"
             action-icon="redo"
             @action="fetchLeaderboard"
           />
@@ -233,7 +234,7 @@ onMounted(() => {
 
                 <div class="flex items-center gap-2 min-w-0">
                   <span class="truncate font-medium text-snow">{{
-                    player.name || "Unknown"
+                    player.name || $t("leaderboard.unknownPlayer")
                   }}</span>
                   <font-awesome-icon
                     v-if="player.rank === 1"
@@ -252,7 +253,7 @@ onMounted(() => {
                 class="shrink-0 rounded-full bg-white/5 px-3 py-1 font-mono text-sm text-snow"
               >
                 {{ player.elo ?? 1000 }}
-                <span class="text-snow-dim">ELO</span>
+                <span class="text-snow-dim">{{ $t("common.elo") }}</span>
               </span>
             </button>
           </div>
@@ -262,9 +263,9 @@ onMounted(() => {
           <div class="glass-card p-6">
             <div class="flex items-start justify-between gap-4">
               <div>
-                <h2 class="text-xl font-bold text-snow">Find a player</h2>
+                <h2 class="text-xl font-bold text-snow">{{ $t("leaderboard.findPlayer") }}</h2>
                 <p class="mt-1 text-sm text-snow-dim">
-                  Look up any player by name.
+                  {{ $t("leaderboard.findPlayerSubtitle") }}
                 </p>
               </div>
               <div
@@ -280,13 +281,13 @@ onMounted(() => {
                   for="player-search"
                   class="block text-xs font-semibold uppercase tracking-wide text-snow-dim"
                 >
-                  Name
+                  {{ $t("leaderboard.name") }}
                 </label>
                 <input
                   id="player-search"
                   v-model="searchQuery"
                   type="text"
-                  placeholder="Start typing a name"
+                  :placeholder="$t('leaderboard.searchPlaceholder')"
                   class="w-full rounded-xl border border-white/10 bg-asphalt/60 px-4 py-3 text-snow placeholder:text-asphalt-muted transition-all focus:border-racket focus:outline-none focus:ring-2 focus:ring-racket/30"
                 />
 
@@ -300,7 +301,7 @@ onMounted(() => {
                       :icon="isSearching ? 'spinner' : 'user-circle'"
                       :class="{ 'animate-spin': isSearching }"
                     />
-                    {{ isSearching ? "Searching..." : "Search" }}
+                    {{ isSearching ? $t("leaderboard.searching") : $t("leaderboard.search") }}
                   </button>
 
                   <button
@@ -310,7 +311,7 @@ onMounted(() => {
                     @click="clearSearch"
                   >
                     <font-awesome-icon icon="times" />
-                    Clear
+                    {{ $t("leaderboard.clear") }}
                   </button>
                 </div>
               </form>
@@ -321,7 +322,7 @@ onMounted(() => {
               class="mt-5 rounded-xl border border-dashed border-white/10 bg-white/5 p-4"
             >
               <p class="text-sm text-snow">
-                Sign in to search players and view profiles.
+                {{ $t("leaderboard.signInPrompt") }}
               </p>
               <button
                 type="button"
@@ -334,17 +335,17 @@ onMounted(() => {
                 "
               >
                 <font-awesome-icon icon="sign-in-alt" />
-                Login to search
+                {{ $t("leaderboard.loginToSearch") }}
               </button>
             </div>
           </div>
 
           <ErrorMessage
             v-if="searchError"
-            title="Search failed"
+            :title="$t('leaderboard.searchFailedTitle')"
             :message="searchError"
-            hint="Try again in a moment."
-            retry-label="Try again"
+            :hint="$t('leaderboard.searchFailedHint')"
+            :retry-label="$t('common.tryAgain')"
             @retry="handleSearch"
           />
 
@@ -355,9 +356,9 @@ onMounted(() => {
               normalizedSearchResults.length === 0
             "
             icon="user-circle"
-            title="No players found."
-            message="Check the spelling or try a shorter name."
-            action-label="Clear search"
+            :title="$t('leaderboard.noResultsTitle')"
+            :message="$t('leaderboard.noResultsMessage')"
+            :action-label="$t('leaderboard.clearSearch')"
             action-icon="times"
             @action="clearSearch"
           />
@@ -368,14 +369,11 @@ onMounted(() => {
           >
             <div class="mb-3 flex items-center justify-between gap-3">
               <h3 class="text-sm font-semibold text-snow">
-                Search results for
+                {{ $t("leaderboard.resultsFor") }}
                 <span class="text-racket">"{{ searchQuery }}"</span>
               </h3>
               <span class="text-xs text-asphalt-muted">
-                {{ normalizedSearchResults.length }}
-                {{
-                  normalizedSearchResults.length === 1 ? "player" : "players"
-                }}
+                {{ $t("leaderboard.playerCount", normalizedSearchResults.length) }}
               </span>
             </div>
 
@@ -395,7 +393,7 @@ onMounted(() => {
 
                 <div class="min-w-0 flex-1">
                   <p class="truncate text-sm font-semibold text-snow">
-                    {{ player.name || "Unknown player" }}
+                    {{ player.name || $t("leaderboard.unknownResult") }}
                   </p>
                 </div>
 
@@ -403,7 +401,7 @@ onMounted(() => {
                   <p class="text-sm font-semibold text-snow">
                     {{ player.elo ?? 1000 }}
                   </p>
-                  <p class="text-[11px] text-snow-dim">ELO</p>
+                  <p class="text-[11px] text-snow-dim">{{ $t("common.elo") }}</p>
                 </div>
               </button>
             </div>

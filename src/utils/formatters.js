@@ -5,10 +5,12 @@
  * @param {Object} [options] - Intl.DateTimeFormat options override
  * @returns {string|null} Formatted date or null if input is falsy
  */
+import { currentLocale } from "@/i18n";
+
 export const formatDate = (dateString, options) => {
   if (!dateString) return null;
   return new Date(dateString).toLocaleDateString(
-    undefined,
+    currentLocale.value,
     options || {
       year: "numeric",
       month: "short",

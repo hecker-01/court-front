@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { t } from "@/i18n";
 import apiService from "@/services/apiService.js";
 import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
@@ -53,9 +54,9 @@ const filterTabs = computed(() => {
     else if (s === "ended" || s === "processed") ended++;
   });
   return [
-    { key: "all", label: "All", count: games.value.length },
-    { key: "started", label: "Started", count: started },
-    { key: "ended", label: "Ended", count: ended },
+    { key: "all", label: t("history.filters.all"), count: games.value.length },
+    { key: "started", label: t("history.filters.started"), count: started },
+    { key: "ended", label: t("history.filters.ended"), count: ended },
   ];
 });
 
@@ -78,9 +79,9 @@ const fetchGames = async () => {
       router.push({ name: "Login", query: { redirect: "/history" } });
       return;
     } else if (err.status === 500) {
-      error.value = "Something went wrong. Please try again later.";
+      error.value = t("common.serverError");
     } else {
-      error.value = err.message || "Failed to load game history";
+      error.value = err.message || t("history.loadError");
     }
   } finally {
     isLoading.value = false;
@@ -106,9 +107,9 @@ onMounted(() => {
   <div class="min-h-[calc(100dvh-var(--nav-h))] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
       <div class="mb-8 pt-4">
-        <h1 class="text-3xl font-bold text-snow">Game History</h1>
+        <h1 class="text-3xl font-bold text-snow">{{ $t("history.title") }}</h1>
         <p class="text-snow-dim text-sm mt-1">
-          Your past games and performance
+          {{ $t("history.subtitle") }}
         </p>
       </div>
 
@@ -154,10 +155,10 @@ onMounted(() => {
       <!-- Error State -->
       <ErrorMessage
         v-else-if="error"
-        title="Error loading games"
+        :title="$t('history.errorTitle')"
         :message="error"
-        hint="We couldn't load your game history. Check your connection and try again."
-        retry-label="Try again"
+        :hint="$t('history.errorHint')"
+        :retry-label="$t('common.tryAgain')"
         @retry="fetchGames"
       />
 
@@ -165,9 +166,9 @@ onMounted(() => {
       <EmptyState
         v-else-if="games.length === 0"
         icon="clipboard-list"
-        title="No games played yet."
-        message="Join a game and start competing!"
-        action-label="Browse Games"
+        :title="$t('history.emptyTitle')"
+        :message="$t('history.emptyMessage')"
+        :action-label="$t('history.browseGames')"
         action-icon="home"
         @action="router.push('/')"
       />
@@ -185,7 +186,7 @@ onMounted(() => {
         <!-- No results for filter -->
         <div v-if="filteredGames.length === 0" class="text-center py-8">
           <p class="text-sm text-asphalt-muted">
-            No {{ activeFilter }} games found.
+            {{ $t("history.noFilterResults", { filter: $t(`history.filters.${activeFilter}`) }) }}
           </p>
         </div>
       </div>

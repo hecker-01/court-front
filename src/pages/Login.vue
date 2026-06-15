@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { t } from "@/i18n";
 import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import FormInput from "@/components/FormInput.vue";
@@ -14,7 +15,7 @@ const isLoading = ref(false);
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
-    error.value = "Please enter both email and password";
+    error.value = t("login.errors.missingFields");
     return;
   }
 
@@ -34,21 +35,21 @@ const handleLogin = async () => {
   } catch (err) {
     // Check for different error types
     if (err.message.includes("429") || err.message.includes("rate limit")) {
-      error.value = "Rate limited. Please try again later.";
+      error.value = t("login.errors.rateLimited");
     } else if (
       err.message.includes("401") ||
       err.message.includes("Invalid credentials")
     ) {
-      error.value = "Invalid email or password. Please try again.";
+      error.value = t("login.errors.invalid");
     } else if (err.message.includes("500")) {
-      error.value = "Something went wrong. Please try again later.";
+      error.value = t("common.serverError");
     } else if (
       err.message.includes("Failed to fetch") ||
       err.message.includes("NetworkError")
     ) {
-      error.value = err.message || "Login failed. Please try again.";
+      error.value = err.message || t("login.errors.generic");
     } else {
-      error.value = err.message || "Login failed. Please try again.";
+      error.value = err.message || t("login.errors.generic");
     }
     console.error("Login error:", err);
   } finally {
@@ -69,10 +70,10 @@ const handleLogin = async () => {
           <font-awesome-icon icon="trophy" class="text-2xl text-white" />
         </div>
         <h2 class="text-3xl font-extrabold tracking-tight text-snow">
-          Welcome back
+          {{ $t("login.title") }}
         </h2>
         <p class="mt-2 text-sm text-snow-dim">
-          Sign in to track your games and ranking.
+          {{ $t("login.subtitle") }}
         </p>
       </div>
 
@@ -84,26 +85,26 @@ const handleLogin = async () => {
           <FormInput
             id="email"
             v-model="email"
-            label="Email"
+            :label="$t('login.email')"
             type="email"
             :required="true"
             :disabled="isLoading"
-            placeholder="Email address"
+            :placeholder="$t('login.emailPlaceholder')"
           />
           <FormInput
             id="password"
             v-model="password"
-            label="Password"
+            :label="$t('login.password')"
             type="password"
             :required="true"
             :disabled="isLoading"
-            placeholder="Password"
+            :placeholder="$t('login.passwordPlaceholder')"
           />
         </div>
 
         <ErrorMessage
           v-if="error"
-          title="Login failed"
+          :title="$t('login.failedTitle')"
           :message="error"
           :hint="error"
         />
@@ -116,16 +117,16 @@ const handleLogin = async () => {
           >
             <LoadingSpinner v-if="isLoading" class="text-white" />
             <font-awesome-icon v-else icon="sign-in-alt" />
-            <span>{{ isLoading ? "Signing in..." : "Sign in" }}</span>
+            <span>{{ isLoading ? $t("login.signingIn") : $t("login.signIn") }}</span>
           </button>
 
           <p class="text-center text-sm text-snow-dim">
-            Or
+            {{ $t("login.or") }}
             <router-link
               to="/signup"
               class="font-semibold text-racket hover:text-racket-hover"
             >
-              create a new account
+              {{ $t("login.createAccount") }}
             </router-link>
           </p>
         </div>
