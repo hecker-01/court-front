@@ -132,7 +132,7 @@ onMounted(() => {
           class="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
           :class="
             activeFilter === tab.key
-              ? 'bg-racket text-white'
+              ? 'bg-racket'
               : 'bg-asphalt-light text-snow hover:bg-asphalt-muted hover:text-snow'
           "
         >

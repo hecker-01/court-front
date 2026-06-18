@@ -56,29 +56,18 @@ const currentUserId = computed(() => {
 });
 
 const hasSchedule = computed(() => {
-  return (
-    authService.isAuthenticated() && game.value?.schedule?.rounds?.length > 0
-  );
+  return game.value?.schedule?.rounds?.length > 0;
 });
+
+const isReadOnly = computed(() => authService.isReadOnly());
 
 const fetchGame = async () => {
   try {
     isLoading.value = true;
     error.value = "";
 
-    if (authService.isAuthenticated()) {
-      const response = await apiService.getGameById(gameId);
-      game.value = response;
-    } else {
-      // Public fallback: fetch from the public games list
-      const games = await apiService.getGames();
-      const found = games.find((g) => String(g.id) === String(gameId));
-      if (!found) {
-        error.value = t("gameDetails.notFound");
-        return;
-      }
-      game.value = found;
-    }
+    const response = await apiService.getGameById(gameId);
+    game.value = response;
   } catch (err) {
     console.error("Failed to fetch game:", err);
     if (err.status === 401) {
@@ -106,7 +95,9 @@ const handleSignup = async () => {
       router.push({ name: "Login", query: { redirect: route.fullPath } });
       return;
     }
-    error.value = err.message || t("gameDetails.signupError");
+    error.value = err.readOnly
+      ? t("readOnly.blocked")
+      : err.message || t("gameDetails.signupError");
   } finally {
     isSigningUp.value = false;
   }
@@ -123,7 +114,9 @@ const handleLeave = async () => {
       router.push({ name: "Login", query: { redirect: route.fullPath } });
       return;
     }
-    error.value = err.message || t("gameDetails.leaveError");
+    error.value = err.readOnly
+      ? t("readOnly.blocked")
+      : err.message || t("gameDetails.leaveError");
   } finally {
     isSigningUp.value = false;
   }
@@ -229,8 +222,9 @@ onMounted(() => {
               <template v-if="game.status === 'planned'">
                 <button
                   v-if="!isUserSignedUp"
-                  class="px-6 py-2.5 bg-racket text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover disabled:opacity-50 disabled:cursor-not-allowed"
-                  :disabled="isSigningUp"
+                  class="px-6 py-2.5 bg-racket rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                  :disabled="isSigningUp || isReadOnly"
+                  :title="isReadOnly ? $t('readOnly.blocked') : ''"
                   @click="handleSignup"
                 >
                   <FontAwesomeIcon icon="sign-in-alt" class="mr-1" />
@@ -239,7 +233,8 @@ onMounted(() => {
                 <button
                   v-else
                   class="px-6 py-2.5 bg-danger-solid text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-danger-hover disabled:opacity-50 disabled:cursor-not-allowed"
-                  :disabled="isSigningUp"
+                  :disabled="isSigningUp || isReadOnly"
+                  :title="isReadOnly ? $t('readOnly.blocked') : ''"
                   @click="handleLeave"
                 >
                   <FontAwesomeIcon icon="sign-out-alt" class="mr-1" />
@@ -250,7 +245,7 @@ onMounted(() => {
             <router-link
               v-else
               :to="{ name: 'Login', query: { redirect: $route.fullPath } }"
-              class="inline-block px-6 py-2.5 bg-racket text-white rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover no-underline"
+              class="inline-block px-6 py-2.5 bg-racket rounded-lg text-sm font-semibold transition-colors duration-200 hover:bg-racket-hover no-underline"
             >
               <FontAwesomeIcon icon="sign-in-alt" class="mr-1" />
               {{ $t("gameDetails.signInToJoin") }}

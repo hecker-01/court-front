@@ -7,6 +7,7 @@ import authService from "@/services/authService.js";
 import EmptyState from "@/components/EmptyState.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import EloChart from "@/components/EloChart.vue";
+import InviteMatchModal from "@/components/InviteMatchModal.vue";
 import { formatDate } from "@/utils/formatters.js";
 
 const router = useRouter();
@@ -38,6 +39,12 @@ const memberSince = computed(() =>
 );
 const profileInitial = computed(
   () => displayName.value.charAt(0).toUpperCase() || "?",
+);
+
+const showInvite = ref(false);
+const isReadOnly = computed(() => authService.isReadOnly());
+const canInvite = computed(
+  () => authService.isAuthenticated() && !isOwnProfile.value && !isReadOnly.value,
 );
 
 const goBack = () => {
@@ -222,7 +229,7 @@ onMounted(() => {
                 <span
                   v-if="player.role"
                   :class="
-                    player.role === 'admin'
+                    player.role === 'manager' || player.role === 'admin'
                       ? 'rounded-full bg-ball/20 px-3 py-1 text-xs font-medium capitalize text-ball'
                       : 'rounded-full bg-asphalt px-3 py-1 text-xs font-medium capitalize text-snow-dim'
                   "
@@ -239,6 +246,14 @@ onMounted(() => {
               {{ $t("profile.rating") }}
             </p>
           </div>
+        </div>
+
+        <!-- Invite to match -->
+        <div v-if="canInvite" class="pt-5">
+          <button type="button" class="btn-violet" @click="showInvite = true">
+            <font-awesome-icon icon="paper-plane" />
+            {{ $t("matchRequests.invite") }}
+          </button>
         </div>
 
         <!-- Stats -->
@@ -292,6 +307,14 @@ onMounted(() => {
           </div>
         </div>
       </section>
+
+      <InviteMatchModal
+        v-if="showInvite && player"
+        :visible="showInvite"
+        :target-user-id="player.id"
+        :target-name="displayName"
+        @close="showInvite = false"
+      />
     </div>
   </div>
 </template>

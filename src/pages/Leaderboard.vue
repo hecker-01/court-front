@@ -222,11 +222,11 @@ onMounted(() => {
                 >
 
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold uppercase text-snow"
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold uppercase"
                   :class="
                     player.rank === 1
                       ? 'bg-violet-grad shadow-glow-sm'
-                      : 'bg-asphalt-light'
+                      : 'bg-asphalt-light text-snow'
                   "
                 >
                   {{ (player.name || "?").charAt(0) }}

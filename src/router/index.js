@@ -11,6 +11,7 @@ const HistoryDetails = () => import("@/pages/HistoryDetails.vue");
 const GameDetails = () => import("@/pages/GameDetails.vue");
 const Account = () => import("@/pages/Account.vue");
 const ProfileDetails = () => import("@/pages/ProfileDetails.vue");
+const MatchRequests = () => import("@/pages/MatchRequests.vue");
 const NotFound = () => import("@/pages/NotFound.vue");
 
 const routes = [
@@ -18,7 +19,7 @@ const routes = [
     path: "/",
     name: "Home",
     component: Home,
-    meta: { title: `Home • ${appConfig.name}` },
+    meta: { title: `Home • ${appConfig.name}`, requiresAuth: true },
   },
   {
     path: "/login",
@@ -36,7 +37,7 @@ const routes = [
     path: "/leaderboard",
     name: "Leaderboard",
     component: Leaderboard,
-    meta: { title: `Leaderboard • ${appConfig.name}` },
+    meta: { title: `Leaderboard • ${appConfig.name}`, requiresAuth: true },
   },
   {
     path: "/history",
@@ -60,7 +61,7 @@ const routes = [
     path: "/details/:id",
     name: "GameDetails",
     component: GameDetails,
-    meta: { title: `Game Details • ${appConfig.name}` },
+    meta: { title: `Game Details • ${appConfig.name}`, requiresAuth: true },
   },
   {
     path: "/account",
@@ -77,6 +78,15 @@ const routes = [
     component: ProfileDetails,
     meta: {
       title: `Profile • ${appConfig.name}`,
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/requests",
+    name: "MatchRequests",
+    component: MatchRequests,
+    meta: {
+      title: `Match Requests • ${appConfig.name}`,
       requiresAuth: true,
     },
   },
@@ -99,24 +109,16 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || appConfig.name;
 
-  // Check if the route requires authentication
-  if (to.meta.requiresAuth) {
-    // Only check if user data exists in localStorage (not validating token)
-    // Token validation happens via HTTP-only cookies on API calls
-    if (!authService.isAuthenticated()) {
-      // No user data, redirect to login
-      next({
-        name: "Login",
-        query: { redirect: to.fullPath },
-      });
-      return;
-    }
+  const isAuthed = authService.isAuthenticated();
+
+  if (to.meta.requiresAuth && !isAuthed) {
+    next({ name: "Login", query: { redirect: to.fullPath } });
+    return;
   }
 
-  // If going to login page and already logged in, redirect to account or intended destination
-  if (to.name === "Login" && authService.isAuthenticated()) {
-    const redirectTo = to.query.redirect || "/account";
-    next(redirectTo);
+  // Already logged in and visiting a login/signup screen → go home.
+  if (["Login", "Signup"].includes(to.name) && isAuthed) {
+    next(to.query.redirect || "/");
     return;
   }
 

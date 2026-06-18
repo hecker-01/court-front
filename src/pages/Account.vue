@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { t } from "@/i18n";
 import apiService from "@/services/apiService.js";
@@ -20,6 +20,7 @@ const editForm = ref({
   email: "",
   phone_number: "",
 });
+const isReadOnly = computed(() => authService.isReadOnly());
 
 const fetchUserData = async () => {
   try {
@@ -31,7 +32,11 @@ const fetchUserData = async () => {
       throw new Error(t("account.userNotFound"));
     }
 
-    const response = await apiService.getUserById(currentUser.id);
+    // Platform admins have no org user record, so read the auth profile;
+    // org members read their full user row.
+    const response = authService.isAdmin()
+      ? await apiService.getProfile()
+      : await apiService.getUserById(currentUser.id);
     user.value = response.user || response;
 
     // Initialize edit form
@@ -70,7 +75,9 @@ const handleUpdateProfile = async () => {
     isEditing.value = false;
   } catch (err) {
     console.error("Failed to update profile:", err);
-    error.value = err.message || t("account.updateError");
+    error.value = err.readOnly
+      ? t("readOnly.blocked")
+      : err.message || t("account.updateError");
   }
 };
 
@@ -112,8 +119,10 @@ const handleDeleteAccount = async () => {
   }
 };
 
-const isAdmin = () => {
-  return user.value?.role === "admin";
+// Managers and platform admins cannot delete their own account (self-delete
+// guard) and have their role shown as the account type.
+const isPrivileged = () => {
+  return user.value?.role === "manager" || user.value?.role === "admin";
 };
 
 onMounted(() => {
@@ -185,7 +194,7 @@ onMounted(() => {
                   <p class="text-snow font-semibold">{{ user.elo ?? 1000 }}</p>
                 </div>
 
-                <div v-if="isAdmin()">
+                <div v-if="isPrivileged()">
                   <p class="text-xs text-asphalt-muted mb-1">{{ $t("account.accountType") }}</p>
                   <p class="text-snow capitalize">
                     {{ user.role || $t("account.roleUser") }}
@@ -218,7 +227,7 @@ onMounted(() => {
                 <div
                   class="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-violet-grad shadow-glow"
                 >
-                  <span class="text-2xl font-bold text-white">
+                  <span class="text-2xl font-bold">
                     {{ (user.username || user.name || "?")[0].toUpperCase() }}
                   </span>
                 </div>
@@ -283,7 +292,12 @@ onMounted(() => {
 
         <!-- Action Buttons Below Card -->
         <div v-if="!isEditing" class="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
-          <button @click="isEditing = true" class="btn-violet">
+          <button
+            @click="isEditing = true"
+            class="btn-violet"
+            :disabled="isReadOnly"
+            :title="isReadOnly ? $t('readOnly.blocked') : ''"
+          >
             <FontAwesomeIcon icon="edit" />
             {{ $t("account.editProfile") }}
           </button>
@@ -296,16 +310,16 @@ onMounted(() => {
           </button>
           <button
             @click="showDeleteConfirm = true"
-            :disabled="isAdmin()"
+            :disabled="isPrivileged()"
             :class="[
               'text-xs',
-              isAdmin()
+              isPrivileged()
                 ? 'text-snow-dim cursor-not-allowed'
                 : 'text-snow-dim hover:text-danger',
             ]"
             :title="
-              isAdmin()
-                ? $t('account.adminCannotDelete')
+              isPrivileged()
+                ? $t('account.cannotDeleteSelf')
                 : $t('account.deleteAccountTitle')
             "
           >

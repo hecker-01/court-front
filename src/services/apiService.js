@@ -43,6 +43,21 @@ class ApiService {
         error.message || `HTTP error! status: ${response.status}`;
       const err = new Error(errorMessage);
       err.status = response.status;
+
+      // Surface the org read-only (inactive) 403 globally so the UI can show a
+      // banner instead of treating it as a fatal error. See API.md "Org status
+      // & read-only mode".
+      if (
+        response.status === 403 &&
+        /read-only/i.test(errorMessage) &&
+        typeof window !== "undefined"
+      ) {
+        err.readOnly = true;
+        window.dispatchEvent(
+          new CustomEvent("org:read-only", { detail: { message: errorMessage } }),
+        );
+      }
+
       throw err;
     }
 
@@ -102,23 +117,41 @@ class ApiService {
     return response;
   }
 
+  /**
+   * Build a query string from a params object, skipping null/undefined values.
+   *
+   * @param {Object} params - Key/value pairs to encode
+   * @returns {string} - A query string starting with "?" or an empty string
+   */
+  buildQuery(params = {}) {
+    const search = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== null && value !== undefined && value !== "") {
+        search.append(key, value);
+      }
+    }
+    const qs = search.toString();
+    return qs ? `?${qs}` : "";
+  }
+
   // ========== AUTH ENDPOINTS ==========
 
   /**
-   * Login a user with email and password
+   * Login a `user` or `manager` within an org.
    *
    * @async
+   * @param {number} orgId - The org the member belongs to
    * @param {string} email - User email
    * @param {string} password - User password
-   * @returns {Promise<Object>} - Login response with user data
+   * @returns {Promise<Object>} - Login response with `user` and `org`
    * @throws {Error} - If the request fails or the response is not successful
    */
-  async login(email, password) {
+  async login(orgId, email, password) {
     const response = await fetch(`${this.baseURL}/auth/login`, {
       method: "POST",
       credentials: "include",
       headers: this.getHeaders(),
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ orgId, email, password }),
     });
     return await this.handleResponse(response);
   }
@@ -176,17 +209,23 @@ class ApiService {
   // ========== GAMES ENDPOINTS ==========
 
   /**
-   * Get all games
+   * Get an org's planned games. Public endpoint: pass `orgId` when not logged
+   * in; logged-in callers use their session org (omit `orgId`).
    *
    * @async
-   * @returns {Promise<Array>} - List of all games
+   * @param {number} [orgId] - Org to list games for (required when unauthenticated)
+   * @returns {Promise<Array>} - List of planned games
    * @throws {Error} - If the request fails or the response is not successful
    */
-  async getGames() {
-    const response = await fetch(`${this.baseURL}/games`, {
-      method: "GET",
-      headers: this.getHeaders(),
-    });
+  async getGames(orgId) {
+    const response = await fetch(
+      `${this.baseURL}/games${this.buildQuery({ orgId })}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: this.getHeaders(),
+      },
+    );
 
     return await this.handleResponse(response);
   }
@@ -234,7 +273,7 @@ class ApiService {
    * Creates a new game with the provided game data.
    *
    * @async
-   * @requires Admin - The user must be logged as admin in to create a game.
+   * @requires Manager - The user must be logged in as a manager to create a game (scoped to their org).
    * @param {Object} gameData - An object containing the details of the game to be created.
    * @returns {Promise<any>} The response data from the server after handling the create game request.
    * @throws {Error} If the request fails or the response is not successful.
@@ -374,17 +413,23 @@ class ApiService {
   // ========== PLAYER ENDPOINTS ==========
 
   /**
-   * Get the public player leaderboard
+   * Get the org leaderboard. Public endpoint: pass `orgId` when not logged in;
+   * logged-in callers use their session org (the `orgId` is ignored server-side).
    *
    * @async
+   * @param {number} [orgId] - Org to fetch the leaderboard for (required when unauthenticated)
    * @returns {Promise<Array>} - Top players ordered by ELO
    * @throws {Error} - If the request fails or the response is not successful
    */
-  async getLeaderboard() {
-    const response = await fetch(`${this.baseURL}/player/leaderboard`, {
-      method: "GET",
-      headers: this.getHeaders(),
-    });
+  async getLeaderboard(orgId) {
+    const response = await fetch(
+      `${this.baseURL}/player/leaderboard${this.buildQuery({ orgId })}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: this.getHeaders(),
+      },
+    );
 
     return await this.handleResponse(response);
   }
@@ -508,6 +553,117 @@ class ApiService {
       },
     );
 
+    return await this.handleResponse(response);
+  }
+
+  // ========== ORGANIZATIONS (PUBLIC + MEMBER) ==========
+
+  /**
+   * List loginable orgs (active + inactive) for the org picker.
+   *
+   * @async
+   * @returns {Promise<Array>} - Orgs with id, name, accentColor, status
+   */
+  async getOrgs() {
+    const response = await fetch(`${this.baseURL}/orgs`, {
+      method: "GET",
+      headers: this.getHeaders(),
+    });
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Search loginable orgs by partial name.
+   *
+   * @async
+   * @param {string} query - Partial org name
+   * @returns {Promise<Array>} - Matching orgs
+   */
+  async searchOrgs(query) {
+    const response = await fetch(
+      `${this.baseURL}/orgs/search${this.buildQuery({ q: query })}`,
+      {
+        method: "GET",
+        headers: this.getHeaders(),
+      },
+    );
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Get the org the caller is logged into (shape depends on role).
+   *
+   * @async
+   * @requires Authentication
+   * @returns {Promise<Object>} - The caller's org
+   */
+  async getMyOrg() {
+    const response = await this.authenticatedFetch(`${this.baseURL}/orgs/me`, {
+      method: "GET",
+    });
+    return await this.handleResponse(response);
+  }
+
+  // ========== GAMES (CURRENT ROUND — VIEW) ==========
+
+  /** Get a game's current round (null if not started). @requires Authentication */
+  async getCurrentRound(id) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${id}/current-round`,
+      { method: "GET" },
+    );
+    return await this.handleResponse(response);
+  }
+
+  // ========== MATCH REQUESTS ==========
+
+  /**
+   * Send a match request to another player for a game.
+   *
+   * @async
+   * @requires Authentication
+   * @param {number} gameId - Game id
+   * @param {Object} body - { requestedForUserId, message? }
+   * @returns {Promise<Object>} - The created request
+   */
+  async sendMatchRequest(gameId, body) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/${gameId}/match-request`,
+      { method: "POST", body: JSON.stringify(body) },
+    );
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Get incoming match requests for the authenticated user.
+   *
+   * @async
+   * @requires Authentication
+   * @param {string} [status] - Optional status filter
+   * @returns {Promise<Array>} - Incoming requests
+   */
+  async getIncomingMatchRequests(status) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/match-requests/incoming${this.buildQuery({ status })}`,
+      { method: "GET" },
+    );
+    return await this.handleResponse(response);
+  }
+
+  /**
+   * Respond to a match request (accept signs you up; reject declines).
+   *
+   * @async
+   * @requires Authentication
+   * @param {number} requestId - Request id
+   * @param {string} status - "accepted" or "rejected"
+   * @returns {Promise<Object>} - The updated request
+   */
+  async respondMatchRequest(requestId, status) {
+    const response = await this.authenticatedFetch(
+      `${this.baseURL}/games/match-requests/${requestId}/respond`,
+      { method: "PUT", body: JSON.stringify({ status }) },
+    );
     return await this.handleResponse(response);
   }
 }

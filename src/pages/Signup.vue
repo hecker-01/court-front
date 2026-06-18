@@ -7,8 +7,10 @@ import authService from "@/services/authService.js";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import FormInput from "@/components/FormInput.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import OrgPicker from "@/components/OrgPicker.vue";
 
 const router = useRouter();
+const selectedOrg = ref(null);
 const formData = ref({
   username: "",
   email: "",
@@ -19,10 +21,19 @@ const formData = ref({
 const error = ref("");
 const isLoading = ref(false);
 
+const onSelectOrg = (org) => {
+  selectedOrg.value = org;
+  error.value = "";
+};
+
 const handleSignup = async () => {
   error.value = "";
 
-  // Validation
+  if (!selectedOrg.value) {
+    error.value = t("signup.errors.missingOrg");
+    return;
+  }
+
   if (
     !formData.value.username ||
     !formData.value.email ||
@@ -46,24 +57,31 @@ const handleSignup = async () => {
 
   try {
     await apiService.registerUser({
+      orgId: selectedOrg.value.id,
       username: formData.value.username,
       email: formData.value.email,
       password: formData.value.password,
-      phone_number: formData.value.phone_number,
-      role: "user",
+      phone_number: formData.value.phone_number || undefined,
     });
 
-    // Auto-login with the credentials just used to register
-    await authService.login(formData.value.email, formData.value.password);
+    // Auto-login with the credentials just used to register.
+    await authService.login(
+      selectedOrg.value.id,
+      formData.value.email,
+      formData.value.password,
+    );
 
     router.push("/");
   } catch (err) {
-    // Check for different error types
-    if (err.message.includes("429") || err.message.includes("rate limit")) {
+    if (err.status === 429 || err.message.includes("rate limit")) {
       error.value = t("signup.errors.rateLimited");
-    } else if (err.message.includes("400")) {
+    } else if (err.status === 404) {
+      error.value = t("signup.errors.orgNotActive");
+    } else if (err.status === 409) {
+      error.value = t("signup.errors.taken");
+    } else if (err.status === 400) {
       error.value = t("signup.errors.invalid");
-    } else if (err.message.includes("500")) {
+    } else if (err.status === 500) {
       error.value = t("common.serverError");
     } else {
       error.value = err.message || t("signup.errors.generic");
@@ -95,7 +113,40 @@ const handleSignup = async () => {
         </p>
       </div>
 
-      <form class="mt-8 space-y-6" @submit.prevent="handleSignup">
+      <!-- Step 1: pick an org -->
+      <div v-if="!selectedOrg" class="glass-card space-y-5 p-7">
+        <p class="text-sm text-snow-dim">{{ $t("signup.chooseOrg") }}</p>
+        <OrgPicker :selected="selectedOrg" @select="onSelectOrg" />
+      </div>
+
+      <form v-else class="mt-8 space-y-6" @submit.prevent="handleSignup">
+        <div
+          class="flex items-center justify-between rounded-xl border border-white/10 bg-asphalt/40 px-4 py-3"
+        >
+          <span class="flex items-center gap-3 min-w-0">
+            <span
+              class="h-3 w-3 shrink-0 rounded-full"
+              :style="{ backgroundColor: selectedOrg.accentColor || '#7c5cfc' }"
+            ></span>
+            <span class="min-w-0">
+              <span
+                class="block text-[10px] uppercase tracking-wide text-asphalt-muted"
+                >{{ $t("signup.selectedOrg") }}</span
+              >
+              <span class="block truncate font-medium text-snow">{{
+                selectedOrg.name
+              }}</span>
+            </span>
+          </span>
+          <button
+            type="button"
+            class="shrink-0 text-sm font-medium text-racket hover:text-racket-hover"
+            @click="selectedOrg = null"
+          >
+            {{ $t("signup.changeOrg") }}
+          </button>
+        </div>
+
         <div class="space-y-4">
           <FormInput
             id="username"
@@ -153,11 +204,13 @@ const handleSignup = async () => {
           <button
             type="submit"
             :disabled="isLoading"
-            class="group relative w-full flex items-center justify-center gap-2 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-racket hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket disabled:opacity-50 disabled:cursor-not-allowed"
+            class="group relative w-full flex items-center justify-center gap-2 py-2 px-4 border border-transparent text-sm font-medium rounded-md bg-racket hover:bg-racket-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-racket disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <LoadingSpinner v-if="isLoading" class="text-white" />
             <font-awesome-icon v-else icon="user-plus" />
-            <span>{{ isLoading ? $t("signup.creating") : $t("signup.signUp") }}</span>
+            <span>{{
+              isLoading ? $t("signup.creating") : $t("signup.signUp")
+            }}</span>
           </button>
         </div>
       </form>

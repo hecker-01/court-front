@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { t, currentLocale } from "@/i18n";
+import { accentColor, accentColor2 } from "@/composables/useBranding.js";
 import {
   Chart,
   LineController,
@@ -51,8 +52,8 @@ const createChart = () => {
     0,
     canvas.value.clientHeight || 300,
   );
-  gradient.addColorStop(0, "rgba(124, 92, 252, 0.35)");
-  gradient.addColorStop(1, "rgba(124, 92, 252, 0)");
+  gradient.addColorStop(0, accentColor(0.35));
+  gradient.addColorStop(1, accentColor(0));
 
   const labels = props.eloData.history.map((h) => formatDate(h.recordedAt));
   const data = props.eloData.history.map((h) => h.elo);
@@ -65,11 +66,11 @@ const createChart = () => {
       datasets: [
         {
           data,
-          borderColor: "#a78bfa",
+          borderColor: accentColor2(),
           backgroundColor: gradient,
-          pointBackgroundColor: "#7c5cfc",
+          pointBackgroundColor: accentColor(),
           pointBorderColor: "#16131f",
-          pointHoverBackgroundColor: "#a78bfa",
+          pointHoverBackgroundColor: accentColor2(),
           pointHoverBorderColor: "#ffffff",
           pointBorderWidth: 2,
           pointRadius: 4,
@@ -88,7 +89,7 @@ const createChart = () => {
           backgroundColor: "#211d2e",
           titleColor: "#9b94b8",
           bodyColor: "#f4f3fb",
-          borderColor: "rgba(124, 92, 252, 0.4)",
+          borderColor: accentColor(0.4),
           borderWidth: 1,
           padding: 12,
           cornerRadius: 12,

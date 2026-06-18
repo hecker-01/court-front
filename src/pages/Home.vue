@@ -19,6 +19,8 @@ const sortedGames = computed(() =>
     }),
 );
 
+// The caller is always authenticated here, so games are scoped to their
+// session org automatically (no orgId needed).
 const fetchGames = async () => {
     try {
         isLoading.value = true;
