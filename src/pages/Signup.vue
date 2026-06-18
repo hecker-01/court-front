@@ -53,10 +53,6 @@ const handleSignup = async () => {
       role: "user",
     });
 
-    // Clear any existing unpaid orders data for new user
-    localStorage.removeItem("hasUnpaidOrders");
-    localStorage.removeItem("lastUnpaidOrderCheck");
-
     // Auto-login with the credentials just used to register
     await authService.login(formData.value.email, formData.value.password);
 
