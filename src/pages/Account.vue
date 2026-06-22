@@ -18,7 +18,6 @@ const showDeleteConfirm = ref(false);
 const editForm = ref({
   username: "",
   email: "",
-  phone_number: "",
 });
 const isReadOnly = computed(() => authService.isReadOnly());
 
@@ -43,7 +42,6 @@ const fetchUserData = async () => {
     editForm.value = {
       username: user.value.username || user.value.name || "",
       email: user.value.email || "",
-      phone_number: user.value.phone_number || "",
     };
   } catch (err) {
     console.error("Failed to fetch user data:", err);
@@ -98,7 +96,6 @@ const cancelEdit = () => {
     editForm.value = {
       username: user.value.username || user.value.name || "",
       email: user.value.email || "",
-      phone_number: user.value.phone_number || "",
     };
   }
 };
@@ -182,13 +179,6 @@ onMounted(() => {
                   </p>
                 </div>
 
-                <div>
-                  <p class="text-xs text-asphalt-muted mb-1">{{ $t("account.phone") }}</p>
-                  <p class="text-snow">
-                    {{ user.phone_number || $t("common.notSet") }}
-                  </p>
-                </div>
-
                 <div class="sm:hidden">
                   <p class="text-xs text-asphalt-muted mb-1">{{ $t("account.eloRating") }}</p>
                   <p class="text-snow font-semibold">{{ user.elo ?? 1000 }}</p>
@@ -268,12 +258,6 @@ onMounted(() => {
                 :label="$t('account.email')"
                 type="email"
                 required
-              />
-              <FormInput
-                id="phone_number"
-                v-model="editForm.phone_number"
-                :label="$t('account.phone')"
-                type="tel"
               />
 
               <div class="flex gap-3 border-t border-white/5 pt-5">

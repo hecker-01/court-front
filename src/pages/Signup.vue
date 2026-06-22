@@ -16,7 +16,6 @@ const formData = ref({
   email: "",
   password: "",
   confirmPassword: "",
-  phone_number: "",
 });
 const error = ref("");
 const isLoading = ref(false);
@@ -61,7 +60,6 @@ const handleSignup = async () => {
       username: formData.value.username,
       email: formData.value.email,
       password: formData.value.password,
-      phone_number: formData.value.phone_number || undefined,
     });
 
     // Auto-login with the credentials just used to register.
@@ -164,14 +162,6 @@ const handleSignup = async () => {
             :required="true"
             :disabled="isLoading"
             :placeholder="$t('signup.emailPlaceholder')"
-          />
-          <FormInput
-            id="phone_number"
-            v-model="formData.phone_number"
-            :label="$t('signup.phone')"
-            type="tel"
-            :disabled="isLoading"
-            :placeholder="$t('signup.phonePlaceholder')"
           />
           <FormInput
             id="password"
